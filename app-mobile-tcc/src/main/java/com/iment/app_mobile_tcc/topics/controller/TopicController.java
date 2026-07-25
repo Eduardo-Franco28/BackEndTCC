@@ -37,12 +37,12 @@ public class TopicController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{subjectId}")
-    public ResponseEntity<List<TopicResponse>> getBySubject(@PathVariable Long subjectId){
-        List<TopicResponse> topics = this.topicService.getBySubject(subjectId);
-
-        return ResponseEntity.ok(topics);
-    }
+//    @GetMapping("/{subjectId}")
+//    public ResponseEntity<List<TopicResponse>> getBySubject(@PathVariable Long subjectId){
+//        List<TopicResponse> topics = this.topicService.getBySubject(subjectId);
+//
+//        return ResponseEntity.ok(topics);
+//    }
 
 
 //    @GetMapping("/{id}")
@@ -52,10 +52,10 @@ public class TopicController {
 //        return ResponseEntity.ok(topic);
 //    }
 
-    @GetMapping
-    public ResponseEntity<List<TopicResponse>> getAll(){
-        List<TopicResponse> topics = this.topicService.getAll();
-
-        return ResponseEntity.ok(topics);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<TopicResponse>> getAll(){
+//        List<TopicResponse> topics = this.topicService.getAll();
+//
+//        return ResponseEntity.ok(topics);
+//    }
 }

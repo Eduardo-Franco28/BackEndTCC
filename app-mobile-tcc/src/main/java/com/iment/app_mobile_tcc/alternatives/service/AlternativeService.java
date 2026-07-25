@@ -59,4 +59,13 @@ public class AlternativeService {
         return this.alternativeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Altenrativa não encontrada"));
     }
+
+    public Long countAlternativesByQuestion(Long questionId){
+        Long alternatives = this.alternativeRepository.countByQuestionId(questionId);
+
+        if(alternatives <= 0)
+            throw new RuntimeException("Essa questão não possuí alternativas");
+
+        return alternatives;
+    }
 }

@@ -34,7 +34,6 @@ public class QuestionService {
             Question question = new Question(
                     null,
                     obj.title(),
-                    obj.level(),
                     topic
             );
 
@@ -60,14 +59,4 @@ public class QuestionService {
         return this.questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Questão não encontrada"));
     }
-
-//    public int percentConclued(Long id){ TODO
-//        Long total = this.questionRepository.countByTopicId(id);
-//        Long totalConclued = this.questionRepository.countByTopicIdAndConcluedTrue(id);
-//
-//        if(total == 0)
-//            return 0;
-//
-//        return (int) ((totalConclued * 100) / total);
-//    }
 }

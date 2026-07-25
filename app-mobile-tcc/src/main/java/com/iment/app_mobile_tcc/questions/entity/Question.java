@@ -21,9 +21,6 @@ public class Question {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private Integer level;
-
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;

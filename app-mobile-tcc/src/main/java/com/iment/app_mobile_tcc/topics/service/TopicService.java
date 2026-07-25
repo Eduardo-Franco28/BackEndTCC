@@ -67,46 +67,46 @@ public class TopicService {
         this.topicRepository.delete(topic);
     }
 
-    public List<TopicResponse> getBySubject(Long subjectId){
-        List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
+//    public List<TopicResponse> getBySubject(Long subjectId){ TODO
+//        List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
+//
+//        if(topics.isEmpty())
+//            throw new RuntimeException("Nenhum tópico encontrado");
+//
+//        return topics.stream()
+//        .map(topic -> {
+//            int percent = this.questionService.percentConclued(topic.getId());
+//            TopicStatusEnum status = this.setTopicStatus(percent);
+//            return TopicResponse.from(topic, percent, status);
+//        })
+//        .toList();
+//    }
 
-        if(topics.isEmpty())
-            throw new RuntimeException("Nenhum tópico encontrado");
-
-        return topics.stream()
-        .map(topic -> {
-            int percent = this.questionService.percentConclued(topic.getId());
-            TopicStatusEnum status = this.setTopicStatus(percent);
-            return TopicResponse.from(topic, percent, status);
-        })
-        .toList();
-    }
-
-    public TopicResponse get(Long id){
-            Topic topic = this.topicRepository.findById(id).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
-
-            int percent = this.questionService.percentConclued(topic.getId());
-            TopicStatusEnum status = this.setTopicStatus(percent);
-
-            return TopicResponse.from(topic, percent, status);
-    }
-
-    public List<TopicResponse> getAll(){
-        try {
-            List<Topic> topics = this.topicRepository.findAll();
-
-            return topics.stream()
-                    .map(topic -> {
-                        int percent = this.questionService.percentConclued(topic.getId());
-                        TopicStatusEnum status = this.setTopicStatus(percent);
-
-                        return TopicResponse.from(topic, percent, status);
-                    })
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("Falha ao buscar pelos tópicos", e);
-        }
-    }
+//    public TopicResponse get(Long id){
+//            Topic topic = this.topicRepository.findById(id).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+//
+//            int percent = this.questionService.percentConclued(topic.getId());
+//            TopicStatusEnum status = this.setTopicStatus(percent);
+//
+//            return TopicResponse.from(topic, percent, status);
+//    }
+//
+//    public List<TopicResponse> getAll(){
+//        try {
+//            List<Topic> topics = this.topicRepository.findAll();
+//
+//            return topics.stream()
+//                    .map(topic -> {
+//                        int percent = this.questionService.percentConclued(topic.getId());
+//                        TopicStatusEnum status = this.setTopicStatus(percent);
+//
+//                        return TopicResponse.from(topic, percent, status);
+//                    })
+//                    .toList();
+//        } catch (Exception e) {
+//            throw new RuntimeException("Falha ao buscar pelos tópicos", e);
+//        }
+//    }
 
     private TopicStatusEnum setTopicStatus(int percent) {
         if(percent == 0)
