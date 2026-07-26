@@ -45,9 +45,9 @@ public class AlternativeService {
 
     public List<AlternativeResponse> getAll(){
         try {
-            List<Alternative> alternatives = this.alternativeRepository.findAll();
+            List<Alternative> lstAlternative = this.alternativeRepository.findAll();
 
-            return alternatives.stream()
+            return lstAlternative.stream()
                     .map(AlternativeResponse::from)
                     .toList();
         } catch (Exception e) {
@@ -60,8 +60,17 @@ public class AlternativeService {
                 .orElseThrow(() -> new EntityNotFoundException("Altenrativa não encontrada"));
     }
 
-    public Long countAlternativesByQuestion(Long questionId){
-        Long alternatives = this.alternativeRepository.countByQuestionId(questionId);
+    public List<Alternative> getAlternatives(List<Long> ids){
+        List<Alternative> lstAlternative = this.alternativeRepository.findAllById(ids);
+
+        if(lstAlternative.isEmpty())
+            throw new EntityNotFoundException("Altenrativa não encontrada");
+
+        return lstAlternative;
+    }
+
+    public Long countCorrectAlternativesByQuestion(Long questionId){
+        Long alternatives = this.alternativeRepository.countByQuestionIdAndCorrectTrue(questionId);
 
         if(alternatives <= 0)
             throw new RuntimeException("Essa questão não possuí alternativas");

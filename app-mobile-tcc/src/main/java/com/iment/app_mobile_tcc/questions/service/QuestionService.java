@@ -45,9 +45,9 @@ public class QuestionService {
 
     public List<QuestionResponse> getAll(){
         try {
-            List<Question> questions = this.questionRepository.findAll();
+            List<Question> lstQuestion = this.questionRepository.findAll();
 
-            return questions.stream()
+            return lstQuestion.stream()
                     .map(QuestionResponse::from)
                     .toList();
         } catch (Exception e) {

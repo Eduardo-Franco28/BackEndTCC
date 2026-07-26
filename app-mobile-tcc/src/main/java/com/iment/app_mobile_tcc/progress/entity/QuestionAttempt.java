@@ -1,6 +1,5 @@
 package com.iment.app_mobile_tcc.progress.entity;
 
-import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
 import com.iment.app_mobile_tcc.questions.entity.Question;
 import com.iment.app_mobile_tcc.users.entity.User;
 import jakarta.persistence.*;
@@ -17,13 +16,13 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-        name = "attempts",
+        name = "question_attempts",
         indexes = {
-                @Index(name = "idx_user_id", columnList = "user_id"),
-                @Index(name = "idx_question", columnList = "question_id")
+                @Index(name = "idx_attempt_user", columnList = "user_id"),
+                @Index(name = "idx_attempt_question", columnList = "question_id")
         }
 )
-public class AttemptAlternative {
+public class QuestionAttempt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,10 +34,6 @@ public class AttemptAlternative {
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
-
-    @ManyToOne
-    @JoinColumn(name = "alternative_id", nullable = false)
-    private Alternative alternative;
 
     @Column(nullable = false)
     private boolean correct;
