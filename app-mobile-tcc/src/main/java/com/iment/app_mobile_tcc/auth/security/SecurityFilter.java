@@ -25,12 +25,18 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
-        if(token != null){
-            var email = tokenService.validateToken(token);
-            UserDetails user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, null);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(token != null){
+            var email = this.tokenService.validateToken(token);
+
+            // token invalido ou usuario inexistente: segue sem autenticar,
+            // quem decide o 401 e o Spring Security
+            if(email != null && !email.isBlank()){
+                this.userRepository.findByEmail(email).ifPresent(user -> {
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                });
+            }
         }
 
         filterChain.doFilter(request, response);

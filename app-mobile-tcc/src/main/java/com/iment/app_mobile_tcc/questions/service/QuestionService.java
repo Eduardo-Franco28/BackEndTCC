@@ -1,6 +1,8 @@
 package com.iment.app_mobile_tcc.questions.service;
 
+import com.iment.app_mobile_tcc.alternatives.dto.response.AlternativeResponse;
 import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
+import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
 import com.iment.app_mobile_tcc.questions.dto.request.QuestionRequest;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
@@ -24,9 +26,15 @@ public class QuestionService {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private AlternativeService alternativeService;
+
     public QuestionResponse create(QuestionRequest obj) {
         if(obj.title() == null || obj.title().isBlank())
             throw new RuntimeException("O nome do tópico não pode vir vazio");
+
+        if(obj.content() == null)
+            throw new RuntimeException("A atividade precisa de conteúdo");
 
         Topic topic = this.topicRepository.findById(obj.topicId()).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
 
@@ -34,12 +42,16 @@ public class QuestionService {
             Question question = new Question(
                     null,
                     obj.title(),
-                    topic
+                    topic,
+                    obj.level(),
+                    obj.type(),
+                    obj.content().toString(),
+                    List.of()
             );
 
-            return QuestionResponse.from(this.questionRepository.save(question));
+            return QuestionResponse.from(this.questionRepository.save(question), false);
         } catch (Exception e){
-            throw new RuntimeException("Falha na criação do tópico", e);
+            throw new RuntimeException("Falha na criação da questão", e);
         }
     }
 
@@ -48,8 +60,24 @@ public class QuestionService {
             List<Question> lstQuestion = this.questionRepository.findAll();
 
             return lstQuestion.stream()
-                    .map(QuestionResponse::from)
+                    .map(question -> QuestionResponse.from(question,false))
                     .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao buscar as questões", e);
+        }
+    }
+
+    public QuestionResponse get(Long id){
+        Question question = this.getQuestion(id);
+
+        List<AlternativeResponse> lstAlternative = this.alternativeService.getAllByQuestionId(id);
+
+        return QuestionResponse.from(question, false);
+    }
+
+    public List<Question> getAllByTopicId(Long topicId){
+        try {
+            return this.questionRepository.findAllByTopicIdWithAlternatives(topicId);
         } catch (Exception e) {
             throw new RuntimeException("Falha ao buscar as questões", e);
         }

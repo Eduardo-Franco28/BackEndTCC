@@ -1,7 +1,5 @@
 package com.iment.app_mobile_tcc.users.entity;
 
-import com.iment.app_mobile_tcc.users.enums.UserEnum;
-import com.iment.app_mobile_tcc.users.enums.UserGrade;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

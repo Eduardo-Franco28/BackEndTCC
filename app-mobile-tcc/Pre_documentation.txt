@@ -1,0 +1,1317 @@
+================================================================================
+
+                      DOCUMENTAÇÃO TÉCNICA DO SERVIDOR
+
+           APLICATIVO EDUCACIONAL MOBILE — TRABALHO DE CONCLUSÃO DE CURSO
+                          Colégio Raphael di Santo
+
+   Equipe: Eduardo Franco, Edson Barbarini, Lucas Volpe, Luiz Felipe,
+           Luiza Marinho e Gabriel Brito
+
+   Documento referente à versão em desenvolvimento do componente servidor
+   (back-end) da aplicação.
+
+================================================================================
+
+
+                                   SUMÁRIO
+
+   1. APRESENTAÇÃO DO SISTEMA
+      1.1 A responsabilidade do servidor
+      1.2 O modelo cliente-servidor
+      1.3 Por que separar aplicativo e servidor
+
+   2. TECNOLOGIAS EMPREGADAS
+      2.1 A linguagem Java
+      2.2 O framework Spring Boot
+      2.3 O mapeamento objeto-relacional
+      2.4 O banco de dados PostgreSQL
+      2.5 A biblioteca de autenticação por token
+      2.6 A biblioteca de redução de código repetitivo
+      2.7 O gerenciador de dependências
+      2.8 As ferramentas de conteinerização
+      2.9 Quadro-resumo
+
+   3. ARQUITETURA DO SISTEMA
+      3.1 A divisão em camadas
+      3.2 A analogia do restaurante
+      3.3 O caminho de uma requisição
+      3.4 A organização por funcionalidade
+      3.5 Exemplo narrado de uma requisição real
+
+   4. MODELAGEM DE DADOS
+      4.1 As entidades do sistema
+      4.2 Os relacionamentos
+      4.3 Diagrama do modelo
+      4.4 A criação automática das tabelas
+
+   5. AUTENTICAÇÃO E SEGURANÇA
+      5.1 O problema que a autenticação resolve
+      5.2 A proteção da senha
+      5.3 O token de acesso
+      5.4 O processo de verificação a cada requisição
+      5.5 Rotas públicas e rotas protegidas
+      5.6 Limitações identificadas
+
+   6. ENDPOINTS DA API
+      6.1 Autenticação e conta do usuário
+      6.2 Matérias
+      6.3 Tópicos
+      6.4 Questões
+      6.5 Alternativas
+      6.6 Progresso do aluno
+
+   7. PADRÕES DE DESENVOLVIMENTO ADOTADOS
+      7.1 Separação de responsabilidades
+      7.2 Objetos de transferência de dados
+      7.3 Convenções de nomenclatura
+      7.4 Validação dos dados recebidos
+      7.5 Tratamento de erros
+      7.6 Proteção de informações sensíveis
+
+   8. ESTÁGIO ATUAL E TRABALHOS FUTUROS
+      8.1 Funcionalidades implementadas
+      8.2 Funcionalidades parcialmente implementadas
+      8.3 Funcionalidades planejadas e não concluídas
+      8.4 Melhorias técnicas previstas
+      8.5 Considerações finais
+
+   ANEXO A — DIVERGÊNCIAS ENTRE O CONTRATO ESPERADO E O IMPLEMENTADO
+
+
+================================================================================
+1. APRESENTAÇÃO DO SISTEMA
+================================================================================
+
+1.1 A responsabilidade do servidor
+
+O sistema descrito neste documento é o componente servidor de um aplicativo
+educacional voltado ao ensino fundamental e médio. Trata-se da parte da
+aplicação que o usuário nunca vê: enquanto o aluno interage com telas, botões e
+animações no celular, é o servidor que guarda as informações, verifica quem está
+acessando, corrige as respostas e calcula o progresso de cada estudante.
+
+A responsabilidade central deste componente pode ser resumida em quatro
+atribuições. A primeira é armazenar de forma permanente todo o conteúdo
+educacional, organizado em quatro níveis hierárquicos: matérias, tópicos,
+questões e alternativas de resposta. A segunda é controlar o acesso, garantindo
+que cada aluno consiga entrar em sua própria conta e que ninguém visualize
+informações alheias. A terceira é receber as respostas enviadas pelos alunos,
+determinar se estão corretas e registrar essa informação. A quarta é calcular
+indicadores de progresso, informando quanto de cada tópico já foi concluído.
+
+É importante destacar, desde o início, que o aplicativo em si — desenvolvido
+separadamente com a tecnologia React Native — não guarda nenhum desses dados. Se
+o aluno desinstalar o aplicativo e instalá-lo novamente em outro aparelho, todo o
+seu progresso continuará disponível, porque ele nunca esteve no celular: sempre
+esteve no servidor.
+
+
+1.2 O modelo cliente-servidor
+
+A organização adotada segue um padrão consagrado na construção de sistemas
+chamado modelo cliente-servidor. Nesse modelo, o software é dividido em duas
+partes que conversam entre si pela internet.
+
+O cliente é o programa com o qual a pessoa interage diretamente. No caso deste
+projeto, é o aplicativo instalado no celular do aluno. Sua função é apresentar as
+informações de forma agradável e capturar as ações do usuário.
+
+O servidor é um programa que fica permanentemente em execução em um computador
+conectado à internet, aguardando pedidos. Ele não possui telas nem botões: sua
+função é receber pedidos, processá-los e devolver respostas.
+
+Uma analogia útil é a de um restaurante. O cliente sentado à mesa consulta o
+cardápio e faz o pedido ao garçom, mas não entra na cozinha nem sabe como o prato
+é preparado. A cozinha, por sua vez, nunca conversa diretamente com o cliente:
+recebe uma comanda escrita, prepara o prato e o devolve. O aplicativo é o salão
+do restaurante; este servidor é a cozinha. A comanda que circula entre os dois é
+o que se chama, na área de tecnologia, de requisição.
+
+O conjunto de pedidos que o servidor sabe atender recebe o nome de API, sigla em
+inglês para Interface de Programação de Aplicações. Trata-se, essencialmente, do
+cardápio do servidor: a lista do que ele aceita receber e do que devolve em cada
+caso. Cada item desse cardápio — cada endereço específico que pode ser chamado —
+é denominado endpoint, termo que pode ser traduzido como ponto de acesso.
+
+
+1.3 Por que separar aplicativo e servidor
+
+A separação entre aplicativo e servidor não é uma exigência técnica arbitrária;
+ela resolve problemas concretos que surgiriam caso tudo fosse construído dentro
+do próprio celular.
+
+O primeiro problema é a permanência dos dados. Informações guardadas apenas no
+aparelho desaparecem quando o aplicativo é desinstalado ou quando o aluno troca
+de celular. Mantidas no servidor, elas sobrevivem a esses eventos.
+
+O segundo problema é o compartilhamento. O conteúdo educacional é o mesmo para
+todos os alunos. Se cada aplicativo armazenasse sua própria cópia das questões,
+qualquer correção em um enunciado exigiria que todos os usuários atualizassem o
+aplicativo. Com o conteúdo centralizado, a correção é feita uma única vez e passa
+a valer imediatamente para todos.
+
+O terceiro problema, e talvez o mais importante, é a confiabilidade. O aplicativo
+está no celular do aluno, um ambiente sobre o qual a equipe não tem controle.
+Alguém com conhecimento técnico poderia inspecionar seu funcionamento e descobrir
+as respostas corretas. Por isso, a verificação de quem acertou e quem errou
+acontece exclusivamente no servidor, ambiente controlado ao qual o usuário não
+tem acesso direto.
+
+O quarto benefício é organizacional: com a separação, integrantes diferentes da
+equipe podem trabalhar simultaneamente no aplicativo e no servidor, desde que
+ambos respeitem o contrato previamente acordado entre as partes.
+
+
+================================================================================
+2. TECNOLOGIAS EMPREGADAS
+================================================================================
+
+Esta seção apresenta cada tecnologia utilizada na construção do servidor,
+explicando o que ela é, qual função desempenha no projeto e por que foi
+escolhida.
+
+
+2.1 A linguagem Java
+
+Java é a linguagem de programação na qual todo o servidor foi escrito. Uma
+linguagem de programação é o idioma em que se descrevem, de maneira precisa, as
+instruções que o computador deve executar.
+
+A versão adotada foi a de número 21, uma das versões classificadas como de
+suporte estendido, o que significa que receberá correções de segurança por
+diversos anos.
+
+A escolha do Java se justifica por três razões. A primeira é a maturidade:
+trata-se de uma linguagem com mais de três décadas de uso, amplamente empregada
+em sistemas corporativos, o que garante vasta documentação e comunidade ativa
+para consulta. A segunda é a chamada tipagem estática, característica pela qual o
+programador precisa declarar antecipadamente que tipo de informação cada dado
+representa — se é um número, um texto ou uma data. Essa exigência faz com que
+grande parte dos erros seja detectada antes mesmo de o programa ser executado, o
+que reduz falhas em produção. A terceira razão é o alinhamento com o conteúdo
+estudado pela equipe durante o curso técnico, permitindo que o trabalho
+consolidasse conhecimentos já adquiridos.
+
+
+2.2 O framework Spring Boot
+
+Um framework pode ser compreendido como uma estrutura pronta sobre a qual se
+constrói um programa. A analogia mais adequada é a da construção civil: em vez de
+fabricar tijolos, portas e instalações elétricas do zero, o construtor recebe uma
+estrutura pré-montada e se concentra em definir a distribuição dos cômodos.
+
+O Spring Boot, na versão 4.0.3, é o framework responsável por toda a
+infraestrutura do servidor. Sem ele, seria necessário programar manualmente a
+capacidade de receber conexões pela internet, interpretar os pedidos recebidos,
+converter dados entre formatos e gerenciar a comunicação com o banco de dados.
+
+Sua adoção se justifica principalmente por dois mecanismos. O primeiro é a
+configuração automática: o framework identifica quais bibliotecas estão presentes
+no projeto e configura sozinho aquilo que costuma ser padrão, reduzindo
+drasticamente a quantidade de decisões que a equipe precisa tomar manualmente. O
+segundo é a injeção de dependências, conceito que merece explicação detalhada.
+
+Programas complexos são formados por componentes que dependem uns dos outros: o
+componente que trata de tópicos precisa consultar o componente que trata de
+questões. Sem injeção de dependências, cada componente teria de construir
+manualmente todos os outros de que necessita, gerando código repetitivo e difícil
+de alterar. Com esse mecanismo, o componente apenas declara do que precisa, e o
+framework se encarrega de fornecer. A analogia adequada é a de um almoxarifado:
+em vez de cada funcionário fabricar suas próprias ferramentas, ele solicita ao
+almoxarifado, que entrega a ferramenta pronta.
+
+Junto ao Spring Boot foram utilizados três módulos complementares: o módulo web,
+que permite receber pedidos pela internet; o módulo de persistência, que
+intermedia a conversa com o banco de dados; e o módulo de segurança, que controla
+o acesso às funcionalidades.
+
+
+2.3 O mapeamento objeto-relacional
+
+Existe uma incompatibilidade fundamental entre a forma como os programas
+organizam informações e a forma como os bancos de dados as armazenam. Programas
+escritos em Java trabalham com objetos, estruturas que agrupam características
+relacionadas. Bancos de dados relacionais trabalham com tabelas, semelhantes a
+planilhas com linhas e colunas.
+
+A tecnologia que resolve essa incompatibilidade é chamada de mapeamento
+objeto-relacional, frequentemente identificada pela sigla ORM. Ela funciona como
+um tradutor automático entre os dois mundos: quando o programa pede para salvar
+um tópico, a ferramenta converte esse objeto em uma linha de tabela; quando o
+programa solicita um tópico, ela lê a linha e reconstrói o objeto.
+
+O projeto utiliza a implementação chamada Hibernate, acessada por meio do módulo
+de persistência do Spring. Sua principal vantagem é eliminar a necessidade de
+escrever manualmente os comandos de consulta ao banco para as operações mais
+comuns. A equipe descreve, em linguagem Java, o que deseja buscar, e a ferramenta
+gera o comando correspondente. Isso reduz erros e torna o código mais legível.
+
+Uma vantagem adicional relevante é a portabilidade: caso fosse necessário trocar
+o banco de dados por outro de fabricante diferente, a maior parte do código
+permaneceria inalterada, pois a tradução para o dialeto específico de cada banco
+é responsabilidade da ferramenta.
+
+
+2.4 O banco de dados PostgreSQL
+
+Um banco de dados é o programa responsável por armazenar informações de forma
+permanente e organizada, garantindo que elas não se percam e possam ser
+recuperadas com rapidez.
+
+O PostgreSQL é o banco escolhido para este projeto. Ele pertence à categoria dos
+bancos relacionais, nos quais os dados são organizados em tabelas que se
+relacionam entre si — de modo que a tabela de tópicos possa indicar a qual
+matéria cada tópico pertence, sem duplicar as informações da matéria.
+
+Sua escolha se justifica por ser um software livre e gratuito, o que elimina
+custos de licenciamento para um trabalho acadêmico; por ser reconhecidamente
+robusto, sendo empregado por organizações de grande porte; e por respeitar
+rigorosamente as regras de integridade dos dados, impedindo, por exemplo, que uma
+questão seja cadastrada apontando para um tópico inexistente.
+
+
+2.5 A biblioteca de autenticação por token
+
+Para controlar quem está acessando o sistema, o projeto emprega uma tecnologia
+chamada JSON Web Token, comumente abreviada como JWT. Trata-se de um padrão
+internacional para a criação de credenciais digitais temporárias, cujo
+funcionamento é detalhado na seção 5.
+
+A biblioteca específica utilizada é a desenvolvida pela empresa Auth0, na versão
+4.5.1. Ela é responsável por duas tarefas: produzir esses tokens no momento do
+login e verificar, a cada pedido recebido, se o token apresentado é autêntico e
+ainda está válido.
+
+A opção por essa abordagem, em vez do método tradicional de sessões armazenadas
+no servidor, se justifica pela natureza da aplicação. Em um aplicativo móvel, a
+conexão é intermitente e o usuário permanece autenticado por longos períodos. O
+token dispensa o servidor de manter memória sobre quem está conectado, o que
+simplifica a arquitetura e facilita a distribuição da carga entre vários
+servidores caso a aplicação cresça.
+
+
+2.6 A biblioteca de redução de código repetitivo
+
+A linguagem Java exige, por natureza, a escrita de trechos repetitivos e
+previsíveis para tarefas simples, como permitir a leitura e a alteração das
+características de um objeto. Para uma entidade com cinco características, seriam
+necessárias dezenas de linhas que não expressam nenhuma regra de negócio.
+
+A biblioteca Lombok resolve esse problema gerando automaticamente esse código no
+momento da compilação. A equipe apenas sinaliza a intenção, e o código repetitivo
+é produzido sem ocupar espaço nos arquivos.
+
+O benefício prático é a legibilidade: os arquivos que descrevem as entidades
+passam a conter apenas o que é essencial — quais informações cada entidade guarda
+e como se relaciona com as demais.
+
+
+2.7 O gerenciador de dependências
+
+Um projeto de software moderno não é escrito integralmente por sua equipe: ele
+utiliza dezenas de bibliotecas produzidas por terceiros. Controlar quais
+bibliotecas são necessárias, em quais versões, e obtê-las manualmente seria
+inviável.
+
+A ferramenta Maven cumpre essa função. A equipe declara em um arquivo único quais
+bibliotecas o projeto necessita, e a ferramenta se encarrega de baixá-las,
+organizá-las e disponibilizá-las. Ela também é responsável por transformar o
+código-fonte em um programa executável.
+
+Uma vantagem prática relevante é a padronização do ambiente: qualquer integrante
+da equipe que obtenha o projeto consegue prepará-lo para execução com um único
+comando, sem depender de configurações manuais que variam de computador para
+computador.
+
+
+2.8 As ferramentas de conteinerização
+
+O projeto inclui arquivos de configuração para a tecnologia Docker, que permite
+empacotar um programa junto com tudo de que ele precisa para funcionar — a versão
+correta da linguagem, as bibliotecas, as configurações — em uma unidade
+autocontida chamada contêiner.
+
+A analogia mais precisa é a do contêiner de transporte marítimo:
+independentemente do que há dentro, o formato externo é padronizado, de modo que
+qualquer navio, caminhão ou guindaste consegue transportá-lo. Da mesma forma, um
+contêiner de software funciona identicamente em qualquer computador que tenha a
+tecnologia instalada.
+
+O projeto possui dois arquivos com essa finalidade: um que descreve como
+construir a imagem do servidor e outro que descreve como executar, em conjunto, o
+servidor e o banco de dados. A motivação para essa escolha é eliminar a
+divergência entre o ambiente de desenvolvimento e o de produção, problema
+recorrente em projetos de software.
+
+Registra-se, contudo, que a configuração de conteinerização encontra-se
+incompleta, conforme detalhado na seção 8 e no Anexo A.
+
+
+2.9 Quadro-resumo
+
+   -------------------------------------------------------------------------
+   TECNOLOGIA             | FINALIDADE NO PROJETO
+   -------------------------------------------------------------------------
+   Java 21                | Linguagem em que todo o servidor foi escrito
+   -------------------------------------------------------------------------
+   Spring Boot 4.0.3      | Estrutura base; recebe pedidos pela internet e
+                          | organiza os componentes do sistema
+   -------------------------------------------------------------------------
+   Spring Web             | Permite que o servidor atenda pedidos vindos do
+                          | aplicativo
+   -------------------------------------------------------------------------
+   Spring Data / JPA      | Traduz entre os objetos do programa e as tabelas
+                          | do banco de dados
+   -------------------------------------------------------------------------
+   Spring Security        | Controla quais funcionalidades exigem
+                          | identificação do usuário
+   -------------------------------------------------------------------------
+   Hibernate              | Executa a tradução objeto-tabela e cria as
+                          | tabelas automaticamente
+   -------------------------------------------------------------------------
+   PostgreSQL             | Armazena permanentemente todas as informações
+   -------------------------------------------------------------------------
+   Biblioteca JWT (Auth0) | Gera e verifica as credenciais temporárias de
+                          | acesso
+   -------------------------------------------------------------------------
+   Lombok                 | Elimina a escrita de código repetitivo nas
+                          | entidades
+   -------------------------------------------------------------------------
+   Maven                  | Gerencia bibliotecas de terceiros e monta o
+                          | programa executável
+   -------------------------------------------------------------------------
+   Docker                 | Empacota o sistema para execução padronizada
+                          | (configuração incompleta)
+   -------------------------------------------------------------------------
+
+
+================================================================================
+3. ARQUITETURA DO SISTEMA
+================================================================================
+
+3.1 A divisão em camadas
+
+O servidor está organizado segundo o padrão conhecido como arquitetura em
+camadas. A ideia central é que cada porção do sistema tenha uma única
+responsabilidade bem delimitada e converse apenas com as camadas imediatamente
+vizinhas.
+
+A primeira camada é a de controle. Ela é a porta de entrada do sistema: recebe os
+pedidos vindos do aplicativo, identifica qual funcionalidade foi solicitada e
+devolve a resposta. Deliberadamente, ela não contém nenhuma regra sobre o
+funcionamento do negócio; apenas encaminha.
+
+A segunda camada é a de serviço. Nela residem todas as regras que definem como o
+sistema se comporta: verificar se um dado obrigatório foi informado, decidir se
+uma resposta está correta, calcular quanto de um tópico já foi concluído. É o
+cérebro da aplicação.
+
+A terceira camada é a de persistência, responsável unicamente por conversar com o
+banco de dados — buscar, gravar, atualizar e remover registros. Ela não toma
+decisão alguma; apenas executa.
+
+Existem ainda duas estruturas auxiliares. As entidades são as representações, em
+linguagem de programação, daquilo que o sistema armazena, e correspondem
+diretamente às tabelas do banco. Os objetos de transferência de dados, conhecidos
+pela sigla DTO, são formatos específicos criados para a conversa com o
+aplicativo, cuja finalidade é detalhada na seção 7.
+
+
+3.2 A analogia do restaurante
+
+Retomando a analogia apresentada anteriormente, a divisão em camadas pode ser
+compreendida da seguinte forma.
+
+A camada de controle é o garçom. Ele recebe o pedido do cliente, anota e leva
+para dentro. Não cozinha nada e não decide o que vai no prato; sua função é ser a
+ponte entre o salão e a cozinha.
+
+A camada de serviço é o chef de cozinha. É ele quem conhece as receitas, sabe a
+ordem correta dos procedimentos e decide se um ingrediente está em condições de
+uso. Toda a inteligência do processo está nele.
+
+A camada de persistência é o almoxarife da despensa. Quando o chef precisa de um
+ingrediente, o almoxarife o busca na prateleira correta e o entrega. Ele não opina
+sobre a receita nem decide o cardápio; apenas localiza e fornece o que foi
+solicitado.
+
+O benefício prático dessa separação é a facilidade de manutenção. Se for
+necessário alterar a regra que determina quando um tópico é considerado
+concluído, sabe-se com precisão onde intervir: na camada de serviço. O garçom e o
+almoxarife permanecem intocados.
+
+
+3.3 O caminho de uma requisição
+
+O trajeto percorrido por um pedido, desde a saída do celular até o retorno da
+resposta, obedece sempre à mesma sequência:
+
+
+        APLICATIVO (celular do aluno)
+                |
+                |  envia o pedido pela internet
+                v
+        +---------------------------+
+        |   FILTRO DE SEGURANÇA     |   Verifica a credencial apresentada
+        |                           |   e identifica de quem é o pedido
+        +---------------------------+
+                |
+                v
+        +---------------------------+
+        |   CAMADA DE CONTROLE      |   Identifica qual funcionalidade
+        |                           |   foi solicitada
+        +---------------------------+
+                |
+                v
+        +---------------------------+
+        |   CAMADA DE SERVIÇO       |   Aplica as regras do negócio,
+        |                           |   valida e decide
+        +---------------------------+
+                |
+                v
+        +---------------------------+
+        |   CAMADA DE PERSISTÊNCIA  |   Busca ou grava os dados
+        +---------------------------+
+                |
+                v
+        +---------------------------+
+        |   BANCO DE DADOS          |   Armazenamento permanente
+        +---------------------------+
+                |
+                |  o resultado retorna pelo mesmo caminho,
+                |  sendo convertido em formato de resposta
+                v
+        APLICATIVO (exibe o resultado na tela)
+
+
+Observa-se que o filtro de segurança ocupa posição anterior a todas as demais
+camadas. Essa posição é intencional: nenhuma funcionalidade deve ser executada
+antes de se saber quem está solicitando.
+
+
+3.4 A organização por funcionalidade
+
+Além da divisão em camadas, o projeto adota uma segunda forma de organização: o
+agrupamento por funcionalidade. Em vez de reunir todos os controladores em um
+lugar, todos os serviços em outro e assim por diante, o código está agrupado por
+assunto — tudo o que diz respeito a tópicos fica reunido, tudo o que diz respeito
+a questões fica reunido, e assim sucessivamente.
+
+Dentro de cada agrupamento, as camadas descritas anteriormente se repetem.
+
+A justificativa para essa escolha é prática. Quando se trabalha em uma
+funcionalidade específica, todos os arquivos relevantes estão próximos, evitando
+navegação constante entre pastas distantes. Além disso, o próprio nome dos
+agrupamentos comunica ao leitor quais são os conceitos centrais do sistema,
+funcionando como documentação implícita.
+
+Os agrupamentos existentes correspondem a usuários, autenticação, matérias,
+tópicos, questões, alternativas e progresso do aluno, além de um agrupamento de
+configurações compartilhadas.
+
+
+3.5 Exemplo narrado de uma requisição real
+
+Para tornar concreto o funcionamento descrito, acompanha-se a seguir o percurso
+completo de um pedido: o aplicativo solicita a lista de matérias disponíveis.
+
+O processo inicia quando o aluno abre a tela de matérias no aplicativo. O
+aplicativo monta um pedido endereçado ao servidor e anexa a ele a credencial
+recebida no momento do login.
+
+Ao chegar ao servidor, o pedido é interceptado pelo filtro de segurança. Este
+extrai a credencial, verifica se ela foi realmente emitida pelo próprio servidor
+e se ainda está no prazo de validade. Sendo autêntica, o filtro identifica a qual
+usuário ela pertence e registra essa identificação para o restante do
+processamento. Caso a credencial esteja ausente ou inválida, o pedido prossegue
+sem identificação e será recusado adiante.
+
+Com o pedido autorizado, ele chega à camada de controle de matérias. Esta
+identifica que se trata de uma consulta à lista completa e repassa a solicitação
+à camada de serviço correspondente.
+
+A camada de serviço solicita à camada de persistência todas as matérias
+cadastradas. A camada de persistência traduz esse pedido em uma consulta ao banco
+de dados, recebe as linhas encontradas e as devolve convertidas em objetos.
+
+De posse dessas informações, a camada de serviço realiza uma etapa essencial:
+converte cada objeto interno em um objeto de transferência de dados, selecionando
+apenas as informações que o aplicativo deve receber. Essa filtragem impede que
+detalhes internos da estrutura do sistema sejam expostos.
+
+A lista convertida retorna à camada de controle, que a entrega ao mecanismo de
+resposta. Este converte os objetos para o formato textual padronizado utilizado
+na comunicação entre sistemas e o transmite de volta pela internet.
+
+Finalmente, o aplicativo recebe a resposta, interpreta o conteúdo e desenha na
+tela a lista de matérias. Todo o percurso descrito ocorre, tipicamente, em
+frações de segundo.
+
+
+================================================================================
+4. MODELAGEM DE DADOS
+================================================================================
+
+4.1 As entidades do sistema
+
+Entende-se por entidade a representação, dentro do sistema, de um conceito do
+mundo real que precisa ser armazenado. Cada entidade corresponde a uma tabela no
+banco de dados, e cada registro individual corresponde a uma linha dessa tabela.
+
+O sistema possui seis entidades.
+
+O usuário representa o aluno cadastrado. Armazena o nome, o endereço de correio
+eletrônico e a senha em formato protegido. O endereço eletrônico é
+obrigatoriamente único no sistema, funcionando como identificador de acesso.
+
+A matéria representa uma disciplina escolar, como Matemática ou Português.
+Armazena apenas o nome, que também deve ser único.
+
+O tópico representa um assunto específico dentro de uma matéria, como Frações ou
+Equações. Armazena um título, um subtítulo descritivo e a indicação de a qual
+matéria pertence.
+
+A questão representa um exercício a ser resolvido pelo aluno. Armazena o
+enunciado, a indicação do tópico a que pertence, o tipo de interação exigida e um
+campo de conteúdo complementar. Esses dois últimos campos merecem explicação. O
+tipo de interação indica ao aplicativo qual formato de exercício deve ser
+apresentado — atualmente há um único tipo previsto, correspondente a um exercício
+em que o aluno arrasta elementos visuais para compor uma operação matemática. O
+campo de conteúdo complementar armazena, em formato textual estruturado, as
+informações específicas daquele tipo de exercício, como os números que compõem a
+operação. Essa solução foi adotada para permitir que novos formatos de exercício
+sejam acrescentados sem alterar a estrutura do banco de dados, uma vez que cada
+formato exige informações diferentes.
+
+A alternativa representa uma opção de resposta vinculada a uma questão. Armazena
+o texto exibido, a indicação de se aquela opção é ou não correta, e a questão a
+que pertence. Registra-se que uma mesma questão pode possuir mais de uma
+alternativa correta, e o sistema está preparado para essa situação.
+
+A tentativa de resposta representa cada vez que um aluno envia uma resposta para
+uma questão. Armazena qual aluno respondeu, qual questão foi respondida, se
+acertou a questão integralmente e o instante exato do envio. Esta entidade é o
+alicerce de todo o acompanhamento de progresso e será detalhada adiante.
+
+
+4.2 Os relacionamentos
+
+Os relacionamentos definem como as entidades se conectam. O tipo predominante
+neste sistema é o chamado um-para-muitos, que significa que um registro de uma
+entidade pode estar associado a vários registros de outra, mas o inverso não
+ocorre.
+
+Uma matéria possui vários tópicos, mas cada tópico pertence a uma única matéria.
+Em termos práticos, a disciplina de Matemática contém os tópicos Frações, Somas e
+Equações, mas o tópico Frações não pertence simultaneamente a Matemática e a
+Português.
+
+Um tópico possui várias questões, e cada questão pertence a um único tópico.
+
+Uma questão possui várias alternativas, e cada alternativa pertence a uma única
+questão.
+
+Um usuário produz várias tentativas de resposta ao longo do tempo, e cada
+tentativa pertence a um único usuário. Do mesmo modo, uma questão pode acumular
+várias tentativas, vindas de alunos diferentes ou do mesmo aluno em momentos
+distintos, mas cada tentativa registra uma única questão.
+
+Esse último conjunto de relacionamentos merece destaque conceitual. Ele
+estabelece a separação entre aquilo que é comum a todos os alunos — o conteúdo
+educacional — e aquilo que pertence individualmente a cada um — o progresso. As
+questões e alternativas são idênticas para todos; apenas as tentativas
+diferenciam um aluno de outro.
+
+
+4.3 Diagrama do modelo
+
+O diagrama a seguir representa as entidades e seus relacionamentos. A notação
+"1 ---- N" indica um relacionamento um-para-muitos, no qual o lado marcado com 1
+possui vários registros do lado marcado com N.
+
+
+   +------------------+
+   |     MATÉRIA      |
+   |------------------|
+   | nome (único)     |
+   +------------------+
+            |
+            | 1 ---- N   (uma matéria contém vários tópicos)
+            v
+   +------------------+
+   |      TÓPICO      |
+   |------------------|
+   | título           |
+   | subtítulo        |
+   +------------------+
+            |
+            | 1 ---- N   (um tópico contém várias questões)
+            v
+   +------------------+                    +------------------------+
+   |     QUESTÃO      |                    |        USUÁRIO         |
+   |------------------|                    |------------------------|
+   | enunciado        |                    | nome                   |
+   | tipo             |                    | e-mail (único)         |
+   | conteúdo         |                    | senha (protegida)      |
+   +------------------+                    +------------------------+
+            |     \                                    /
+            |      \  1 ---- N                        / 1 ---- N
+            |       \                                /
+            |        \                              /
+            |         v                            v
+            |      +----------------------------------+
+            |      |     TENTATIVA DE RESPOSTA        |
+            |      |----------------------------------|
+            |      | acertou (sim ou não)             |
+            |      | data e hora do envio             |
+            |      +----------------------------------+
+            |
+            | 1 ---- N   (uma questão possui várias alternativas)
+            v
+   +------------------+
+   |   ALTERNATIVA    |
+   |------------------|
+   | texto exibido    |
+   | é correta?       |
+   +------------------+
+
+
+A leitura do diagrama revela a organização em duas regiões. A coluna à esquerda,
+que vai da matéria até a alternativa, constitui o conteúdo educacional,
+compartilhado por todos os alunos. A entidade central inferior, que registra as
+tentativas, constitui o progresso individual, e é o único ponto em que o conteúdo
+se cruza com o usuário.
+
+
+4.4 A criação automática das tabelas
+
+As tabelas do banco de dados não foram criadas manualmente pela equipe. O sistema
+está configurado para que a ferramenta de mapeamento examine, durante a
+inicialização, as entidades descritas no código e crie ou ajuste automaticamente
+as tabelas correspondentes.
+
+Essa estratégia oferece agilidade durante o desenvolvimento: ao acrescentar uma
+característica a uma entidade, a coluna correspondente surge no banco sem
+intervenção manual.
+
+Cumpre registrar, entretanto, que essa abordagem é considerada adequada apenas
+para a fase de desenvolvimento. Em sistemas em produção, recomenda-se o uso de
+ferramentas de migração — programas que aplicam alterações controladas e
+versionadas na estrutura do banco, permitindo reverter mudanças e preservando os
+dados existentes. A adoção de tal ferramenta consta entre as melhorias previstas
+na seção 8.
+
+Foram definidos índices sobre a tabela de tentativas de resposta. Um índice é uma
+estrutura auxiliar que acelera as buscas, cumprindo função análoga à de um índice
+remissivo em um livro: em vez de percorrer todas as páginas em busca de um termo,
+consulta-se a lista que indica diretamente onde ele aparece. Os índices criados
+otimizam as consultas por usuário e por questão, que são as mais frequentes no
+cálculo de progresso.
+
+
+================================================================================
+5. AUTENTICAÇÃO E SEGURANÇA
+================================================================================
+
+5.1 O problema que a autenticação resolve
+
+Todo sistema que armazena informações pessoais precisa responder a duas
+perguntas distintas. A primeira é "quem está acessando?", cuja resposta se
+denomina autenticação. A segunda é "esta pessoa pode fazer o que está tentando
+fazer?", cuja resposta se denomina autorização.
+
+No contexto deste projeto, a autenticação é indispensável porque o progresso é
+individual: o sistema precisa saber de quem são as respostas recebidas e a quem
+pertencem os indicadores de desempenho consultados.
+
+
+5.2 A proteção da senha
+
+A senha escolhida pelo aluno nunca é armazenada em formato legível. Antes de ser
+gravada, ela passa por um procedimento chamado hash, que a transforma em uma
+sequência aparentemente aleatória de caracteres.
+
+A propriedade essencial desse procedimento é ser irreversível: é possível
+transformar a senha na sequência, mas não é possível, a partir da sequência,
+recuperar a senha original. Uma analogia adequada é a de triturar um documento: o
+processo é simples e rápido, mas reconstruir o documento a partir dos fragmentos
+é inviável.
+
+A verificação no momento do acesso, portanto, não consiste em comparar senhas.
+Consiste em aplicar o mesmo procedimento à senha digitada e comparar as duas
+sequências resultantes. Se coincidem, a senha está correta.
+
+O algoritmo empregado chama-se BCrypt, escolhido por duas características. A
+primeira é que ele incorpora, a cada senha, um elemento aleatório adicional, de
+modo que duas pessoas com a mesma senha produzem sequências diferentes — o que
+impede a identificação de senhas repetidas. A segunda é que ele foi
+deliberadamente projetado para ser lento em termos computacionais, o que torna
+inviável a tentativa de descobrir senhas por força bruta, isto é, testando
+milhões de combinações.
+
+A consequência prática dessa escolha é relevante: caso o banco de dados fosse
+indevidamente acessado por terceiros, as senhas dos alunos permaneceriam
+protegidas, pois o invasor teria acesso apenas às sequências irreversíveis.
+
+
+5.3 O token de acesso
+
+Seria inconveniente e inseguro exigir que o aluno digitasse a senha a cada
+operação realizada no aplicativo. A solução adotada é a emissão de uma credencial
+temporária, o token.
+
+A analogia mais esclarecedora é a da pulseira de acesso a um evento. Ao chegar, o
+participante apresenta seu documento de identidade na portaria, onde é conferido
+uma única vez. Verificada a identidade, ele recebe uma pulseira. A partir daí,
+para circular pelas áreas do evento, basta mostrar a pulseira — ninguém solicita
+novamente o documento. A pulseira não pode ser falsificada, porque possui
+características que apenas a organização consegue produzir, e perde a validade ao
+fim do evento.
+
+O token opera exatamente assim. No momento do acesso, o aluno apresenta suas
+credenciais uma única vez. Verificadas, o servidor emite um token que o aplicativo
+armazena e anexa a todos os pedidos subsequentes.
+
+Tecnicamente, esse token contém três informações: a identificação de quem o
+emitiu, a identificação de a quem pertence — neste projeto, o endereço eletrônico
+do aluno — e a data de expiração. Sobre esse conteúdo é aplicada uma assinatura
+digital, gerada a partir de uma chave secreta conhecida apenas pelo servidor.
+
+A assinatura é o elemento central da segurança. Ela não impede que alguém leia o
+conteúdo do token, mas impede que ele seja alterado: qualquer modificação invalida
+a assinatura, e o servidor detecta a fraude imediatamente. Assim, um usuário
+mal-intencionado não consegue alterar o token para se passar por outro aluno.
+
+O prazo de validade configurado é de sessenta dias. Esse período extenso foi
+escolhido para evitar que o aluno precise repetir o procedimento de acesso com
+frequência, priorizando a conveniência de uso. Registra-se, contudo, que prazos
+longos aumentam a janela de risco em caso de vazamento do token, aspecto
+discutido na subseção 5.6.
+
+
+5.4 O processo de verificação a cada requisição
+
+Todo pedido dirigido ao servidor passa por um componente de verificação antes de
+alcançar qualquer funcionalidade. Esse componente executa uma sequência
+determinada de ações.
+
+Primeiro, procura no pedido a credencial anexada. Caso não encontre nenhuma, o
+pedido prossegue sem identificação — situação normal para as rotas públicas.
+
+Encontrando uma credencial, verifica se a assinatura digital é autêntica e se o
+prazo de validade não expirou. Sendo o token inválido ou expirado, o pedido também
+prossegue sem identificação, e será recusado adiante caso a funcionalidade
+solicitada exija autenticação.
+
+Sendo o token válido, o componente extrai dele a identificação do aluno, localiza
+o cadastro correspondente e registra essa identificação, de modo que as camadas
+seguintes saibam de quem se trata sem precisar consultar novamente.
+
+Um ponto importante de projeto merece registro: a identidade do usuário é sempre
+obtida a partir do token, nunca a partir de informações enviadas pelo aplicativo.
+Caso o aplicativo pudesse informar de quem é o pedido, bastaria alterar esse dado
+para acessar o progresso de outro aluno. Ao derivar a identidade exclusivamente
+do token assinado, essa possibilidade é eliminada.
+
+
+5.5 Rotas públicas e rotas protegidas
+
+O sistema classifica seus pontos de acesso em duas categorias.
+
+São públicos, isto é, acessíveis sem qualquer credencial, apenas o cadastro de
+novo usuário e o acesso à conta. A razão é evidente: não seria possível exigir
+credencial de quem ainda não a possui.
+
+Todos os demais pontos de acesso exigem autenticação. Isso inclui não apenas as
+consultas ao progresso individual, mas também a consulta ao conteúdo educacional
+e as operações de cadastro de matérias, tópicos, questões e alternativas.
+
+O sistema opera em modo sem estado, o que significa que o servidor não mantém
+memória de sessões anteriores. Cada pedido é avaliado isoladamente, com base
+exclusivamente no token apresentado.
+
+
+5.6 Limitações identificadas
+
+A análise do sistema identificou três limitações de segurança que se registram
+por honestidade técnica.
+
+A primeira refere-se à ausência de níveis de permissão. Embora todas as operações
+de cadastro de conteúdo exijam autenticação, não há distinção entre um aluno
+comum e um administrador. Consequentemente, qualquer usuário autenticado pode, em
+tese, cadastrar ou remover matérias, tópicos e questões. A estrutura para
+diferenciar perfis foi iniciada mas não concluída, permanecendo desativada no
+código.
+
+A segunda refere-se à exposição da resposta correta. Ao consultar as alternativas
+de uma questão, o servidor informa, para cada uma, se ela é a correta. Como essa
+informação trafega até o aplicativo, um usuário com conhecimento técnico poderia
+inspecionar os dados recebidos e identificar a resposta antes de responder. A
+correção adequada consiste em omitir esse dado nas consultas, mantendo-o
+exclusivamente no servidor para uso no momento da correção.
+
+A terceira refere-se à validade dos tokens já emitidos. Como o sistema opera sem
+estado, a alteração de senha não invalida tokens emitidos anteriormente. Um token
+eventualmente vazado permanece utilizável até sua expiração natural, o que, dado o
+prazo de sessenta dias, representa uma janela considerável.
+
+
+================================================================================
+6. ENDPOINTS DA API
+================================================================================
+
+Esta seção descreve todos os pontos de acesso atualmente ativos no servidor. Para
+cada um, indica-se a função, o que deve ser enviado, o que é devolvido e se há
+exigência de autenticação.
+
+
+6.1 Autenticação e conta do usuário
+
+O cadastro de novo usuário é realizado por meio de um envio ao endereço de
+registro, sob o agrupamento de autenticação. Deve-se informar o nome, o endereço
+eletrônico e a senha desejada. O servidor verifica se o endereço já está em uso e,
+não estando, protege a senha, grava o cadastro e emite imediatamente uma
+credencial de acesso. A resposta contém a credencial e os dados do usuário
+recém-criado, permitindo que o aluno seja direcionado ao aplicativo sem
+necessidade de um acesso subsequente. Não exige autenticação prévia.
+
+O acesso à conta é realizado por envio ao endereço correspondente, informando o
+endereço eletrônico e a senha. O servidor confere as credenciais e, estando
+corretas, devolve uma credencial de acesso acompanhada dos dados do usuário. Não
+exige autenticação prévia.
+
+A consulta aos dados do próprio usuário é feita pelo endereço de identificação
+pessoal. Não requer o envio de nenhuma informação, pois o servidor identifica o
+solicitante pela credencial apresentada. Devolve o identificador, o nome e o
+endereço eletrônico. Exige autenticação.
+
+A alteração dos dados cadastrais é realizada por meio de uma atualização parcial
+endereçada ao recurso de senha. Podem ser enviados, isolada ou conjuntamente, um
+novo nome, um novo endereço eletrônico e uma nova senha; os campos não enviados
+permanecem inalterados. Em todos os casos é obrigatório informar a senha atual,
+que funciona como confirmação de identidade. O servidor verifica a senha atual,
+confere se o novo endereço eletrônico já não pertence a outro usuário, aplica as
+alterações solicitadas e emite uma nova credencial, devolvida junto aos dados
+atualizados. A emissão de nova credencial é necessária porque a credencial
+anterior faz referência ao endereço eletrônico antigo. Exige autenticação.
+
+
+6.2 Matérias
+
+O cadastro de uma nova matéria é feito por envio ao endereço de matérias,
+informando o nome desejado. O servidor rejeita nomes vazios e devolve os dados da
+matéria criada. Exige autenticação.
+
+A consulta à lista completa de matérias é feita por requisição ao mesmo endereço.
+Não requer envio de informações e devolve a relação de todas as matérias
+cadastradas, cada uma com seu identificador e nome. Exige autenticação.
+
+
+6.3 Tópicos
+
+O cadastro de um novo tópico é feito por envio ao endereço de tópicos, informando
+o título, o subtítulo e o identificador da matéria a que pertence. O servidor
+verifica se o título foi informado e se a matéria indicada existe. Exige
+autenticação.
+
+A alteração de um tópico existente é feita por envio de substituição ao endereço
+do tópico acrescido de seu identificador. Atualmente, apenas o título é
+efetivamente modificado. Exige autenticação.
+
+A remoção de um tópico é feita por requisição de exclusão ao endereço do tópico
+acrescido de seu identificador. Exige autenticação.
+
+Registra-se que as consultas de tópicos — tanto a listagem geral quanto a busca
+por matéria — encontram-se desativadas no código, conforme detalhado na seção 8 e
+no Anexo A.
+
+
+6.4 Questões
+
+O cadastro de uma nova questão é feito por envio ao endereço de questões,
+informando o enunciado, o identificador do tópico, o tipo de interação e o
+conteúdo complementar. O servidor recusa enunciados vazios e conteúdos ausentes, e
+verifica a existência do tópico indicado. Exige autenticação.
+
+A consulta à lista completa de questões é feita por requisição ao mesmo endereço.
+Devolve todas as questões cadastradas no sistema, sem filtro por tópico. Exige
+autenticação.
+
+A consulta a uma questão específica é feita por requisição ao endereço de questões
+acrescido do identificador da questão. Devolve os dados da questão acompanhados de
+suas alternativas. Exige autenticação.
+
+Registra-se que a consulta de questões filtradas por tópico foi implementada na
+camada de serviço, mas ainda não foi disponibilizada como ponto de acesso,
+permanecendo indisponível ao aplicativo.
+
+
+6.5 Alternativas
+
+O cadastro de uma nova alternativa é feito por envio ao endereço de alternativas,
+informando o texto, a indicação de se é correta e o identificador da questão a que
+pertence. Exige autenticação.
+
+A consulta à lista completa de alternativas é feita por requisição ao mesmo
+endereço. Devolve todas as alternativas cadastradas no sistema, sem filtro. Exige
+autenticação.
+
+Registra-se que a consulta de alternativas filtradas por questão foi implementada
+na camada de serviço, mas não foi disponibilizada como ponto de acesso.
+
+
+6.6 Progresso do aluno
+
+O envio de uma resposta é feito por meio de requisição ao endereço de progresso
+acrescido do complemento de resposta. Deve-se informar o identificador da questão
+e a relação de identificadores das alternativas selecionadas. A identificação do
+aluno é obtida da credencial, não sendo enviada pelo aplicativo.
+
+O processamento realizado merece descrição detalhada, por conter a principal regra
+de negócio do sistema. O servidor localiza todas as alternativas indicadas,
+verifica quantas delas são corretas e se alguma incorreta foi selecionada, e
+compara esse resultado com o total de alternativas corretas existentes na questão.
+A questão é considerada acertada somente quando o aluno seleciona todas as
+alternativas corretas e nenhuma incorreta. Essa regra permite que questões tenham
+mais de uma resposta correta simultaneamente.
+
+Registrado o resultado, o servidor devolve duas informações: se o aluno acertou
+naquele envio e se a questão encontra-se concluída. A questão é considerada
+concluída quando existe, no histórico, ao menos um envio integralmente correto.
+Cada envio é registrado, correto ou não, o que preserva o histórico de erros para
+futuros indicadores de desempenho. Exige autenticação.
+
+
+================================================================================
+7. PADRÕES DE DESENVOLVIMENTO ADOTADOS
+================================================================================
+
+7.1 Separação de responsabilidades
+
+O princípio norteador da organização do código é o de que cada componente deve
+ter uma única responsabilidade. A camada de controle não contém regras de
+negócio; a camada de serviço não acessa diretamente o banco de dados; a camada de
+persistência não toma decisões.
+
+O benefício prático é a previsibilidade da manutenção. Diante da necessidade de
+alterar uma regra, sabe-se de antemão onde intervir, sem necessidade de examinar o
+sistema inteiro. Igualmente, um erro em determinada categoria pode ser procurado
+na camada correspondente.
+
+Uma convenção complementar foi estabelecida quanto à comunicação entre
+agrupamentos: quando um componente necessita de dados pertencentes a outro
+assunto, ele solicita ao serviço responsável por aquele assunto, em vez de acessar
+diretamente a camada de persistência alheia. Isso garante que as regras associadas
+a cada conceito sejam sempre respeitadas, mesmo quando o dado é consumido por
+outra parte do sistema.
+
+
+7.2 Objetos de transferência de dados
+
+O sistema mantém distinção rigorosa entre as estruturas que representam os dados
+armazenados e as estruturas utilizadas na comunicação com o aplicativo. Estas
+últimas são os objetos de transferência de dados.
+
+Três motivos justificam essa separação. O primeiro é de segurança: a estrutura
+interna do usuário contém a senha protegida, informação que jamais deve trafegar
+até o aplicativo. Utilizando uma estrutura específica para a resposta, apenas os
+campos desejados são incluídos. O segundo é de estabilidade: alterações na
+estrutura interna não afetam automaticamente o contrato acordado com o aplicativo,
+evitando quebras inesperadas. O terceiro é de adequação: a resposta pode conter
+informações calculadas que não existem no banco, como o percentual de conclusão de
+um tópico.
+
+Adotou-se ainda a prática de concentrar, em cada estrutura de resposta, o
+procedimento de conversão a partir da estrutura interna, evitando que essa
+conversão seja reescrita em cada ponto do sistema.
+
+
+7.3 Convenções de nomenclatura
+
+A equipe estabeleceu convenções de nomenclatura com a finalidade de tornar o
+código previsível. Os componentes recebem sufixos que indicam sua camada, de modo
+que o nome revele imediatamente a função — controladores, serviços, repositórios,
+requisições e respostas são distinguíveis pelo nome.
+
+Convencionou-se ainda um prefixo padronizado para variáveis que armazenam coleções
+de registros, seguido do nome da entidade em questão, o que permite identificar
+visualmente, durante a leitura, quando se está lidando com um conjunto e não com
+um item isolado.
+
+Os nomes das estruturas e dos campos foram mantidos em inglês, seguindo a
+convenção predominante na área, enquanto as mensagens dirigidas ao usuário foram
+redigidas em português.
+
+
+7.4 Validação dos dados recebidos
+
+O sistema aplica verificações sobre os dados recebidos antes de utilizá-los. As
+validações concentram-se na camada de serviço, imediatamente antes das operações
+de gravação.
+
+Verifica-se a presença e o preenchimento de campos obrigatórios, como títulos e
+enunciados. Verifica-se a existência dos registros referenciados, de modo que não
+se cadastre um tópico apontando para uma matéria inexistente. Verifica-se a
+unicidade de valores que não podem se repetir, como o endereço eletrônico do
+usuário.
+
+Adotou-se ainda uma convenção específica para as operações de atualização parcial:
+campos não informados são interpretados como "manter o valor atual", e não como
+"apagar o valor". Essa distinção é implementada verificando, antes de cada
+alteração, se o dado correspondente foi efetivamente enviado.
+
+Registra-se que o campo de conteúdo complementar das questões, por ser armazenado
+em formato textual livre, não é validado quanto à sua estrutura interna. Trata-se
+de uma contrapartida conhecida da flexibilidade obtida: ganha-se a possibilidade
+de acrescentar novos formatos sem alterar o banco, perde-se a verificação
+automática. A implementação de validações específicas por tipo consta entre as
+melhorias previstas.
+
+
+7.5 Tratamento de erros
+
+Quando uma verificação falha, o sistema interrompe o processamento e emite uma
+condição de erro contendo mensagem descritiva em português, adequada à exibição ao
+usuário.
+
+Registra-se, entretanto, que todas as condições de erro são atualmente emitidas
+sob uma mesma categoria genérica. A consequência prática é que situações de
+natureza distinta — um dado inválido informado pelo usuário, um registro
+inexistente, uma credencial expirada — resultam todas no mesmo código de resposta,
+o qual indica falha interna do servidor. Do ponto de vista do aplicativo,
+torna-se impossível distinguir automaticamente entre "o dado enviado está
+incorreto" e "o servidor apresentou defeito", o que prejudica a exibição de
+mensagens adequadas ao aluno. A implementação de um tratamento centralizado, capaz
+de traduzir cada categoria de erro no código de resposta apropriado, consta entre
+as melhorias previstas.
+
+
+7.6 Proteção de informações sensíveis
+
+As credenciais de acesso ao banco de dados e a chave secreta utilizada na
+assinatura dos tokens não estão gravadas no código-fonte. Elas são lidas de
+variáveis de ambiente — valores configurados no computador que executa o servidor,
+externamente ao projeto.
+
+A motivação é direta: o código-fonte é versionado e compartilhado entre os
+integrantes da equipe, podendo eventualmente tornar-se público. Senhas gravadas no
+código acompanhariam essas cópias e permaneceriam registradas no histórico de
+versões mesmo após removidas.
+
+Registra-se que essa configuração possui a contrapartida de exigir que as
+variáveis estejam corretamente definidas antes da execução; caso contrário, o
+servidor não inicializa.
+
+
+================================================================================
+8. ESTÁGIO ATUAL E TRABALHOS FUTUROS
+================================================================================
+
+8.1 Funcionalidades implementadas
+
+Encontram-se plenamente implementadas e operacionais as funcionalidades descritas
+a seguir.
+
+O cadastro de novos usuários opera integralmente, incluindo a verificação de
+endereço eletrônico duplicado, a proteção da senha e a emissão imediata de
+credencial de acesso.
+
+O acesso à conta opera integralmente, conferindo as credenciais informadas e
+emitindo o token correspondente.
+
+A consulta aos dados do próprio usuário opera a partir da credencial apresentada.
+
+A alteração dos dados cadastrais opera com atualização parcial, exigindo
+confirmação por senha e emitindo nova credencial ao final.
+
+O cadastro e a listagem de matérias operam integralmente.
+
+O cadastro, a alteração e a remoção de tópicos operam.
+
+O cadastro de questões opera, contemplando o tipo de interação e o conteúdo
+complementar.
+
+O cadastro de alternativas opera, admitindo mais de uma alternativa correta por
+questão.
+
+O registro de respostas dos alunos opera integralmente, com a regra de correção
+que exige a seleção de todas as alternativas corretas e de nenhuma incorreta, e
+com o registro do histórico completo de tentativas, incluindo as malsucedidas.
+
+A verificação de conclusão de uma questão opera, baseada na existência de ao menos
+um envio integralmente correto.
+
+
+8.2 Funcionalidades parcialmente implementadas
+
+A estrutura de acompanhamento de progresso encontra-se em estágio intermediário. O
+mecanismo que determina se uma questão foi concluída está operacional, mas o
+cálculo do percentual de conclusão de um tópico, embora previsto na estrutura de
+resposta, não está conectado ao registro de tentativas. Em consequência, o
+percentual devolvido é sempre nulo e o estado do tópico é sempre informado como
+não iniciado, independentemente do progresso real do aluno.
+
+A consulta de questões filtradas por tópico foi construída na camada de serviço,
+mas não foi disponibilizada como ponto de acesso, permanecendo inacessível ao
+aplicativo. Situação idêntica aplica-se à consulta de alternativas filtradas por
+questão.
+
+A configuração de conteinerização encontra-se descrita, mas os nomes das variáveis
+de ambiente declarados no arquivo de orquestração divergem dos nomes efetivamente
+esperados pelo servidor, o que impede o funcionamento do conjunto sem ajuste
+prévio.
+
+
+8.3 Funcionalidades planejadas e não concluídas
+
+O sistema de perfis de acesso foi planejado e sua estrutura básica chegou a ser
+esboçada, mas permanece desativada. Em consequência, não há distinção entre alunos
+e administradores, e qualquer usuário autenticado pode executar operações de
+cadastro de conteúdo.
+
+A consulta de tópicos, tanto na forma de listagem geral quanto na forma filtrada
+por matéria, foi implementada e posteriormente desativada, em razão de conflito
+entre os endereços definidos para as duas operações, que possuíam formato idêntico
+e impossibilitavam a distinção pelo servidor. A reformulação desses endereços
+permanece pendente.
+
+O registro do ano escolar do aluno foi implementado e posteriormente removido do
+cadastro, permanecendo no projeto apenas a estrutura de classificação dos anos
+escolares, atualmente sem uso.
+
+A ordenação das questões dentro de um tópico, prevista para viabilizar a
+progressão gradual de dificuldade e a retomada do ponto em que o aluno parou,
+chegou a ser implementada e foi posteriormente removida durante a reformulação do
+modelo de questões. Sua reintrodução é necessária para as funcionalidades
+dependentes.
+
+O cálculo de indicadores de desempenho — quantidade de erros por questão, número
+de tentativas até o acerto e identificação dos pontos de maior dificuldade — foi
+previsto na modelagem, e os dados necessários já estão sendo registrados, mas os
+métodos de consulta correspondentes ainda não foram construídos.
+
+
+8.4 Melhorias técnicas previstas
+
+Prevê-se a implementação de um tratamento centralizado de erros, capaz de traduzir
+cada categoria de falha no código de resposta apropriado, permitindo que o
+aplicativo distinga um dado inválido de uma falha do servidor.
+
+Prevê-se a omissão da indicação de resposta correta nas consultas de alternativas,
+mantendo essa informação restrita ao servidor.
+
+Prevê-se a substituição da criação automática de tabelas por uma ferramenta de
+migração versionada, adequada à operação em ambiente de produção.
+
+Prevê-se a reformulação dos endereços de consulta, adotando estrutura aninhada que
+expresse a hierarquia do conteúdo e elimine os conflitos identificados.
+
+Prevê-se a construção de um ponto de acesso agregado que devolva, em uma única
+requisição, todas as questões de um tópico acompanhadas de suas alternativas e do
+estado de conclusão de cada uma, reduzindo o número de comunicações necessárias
+para a montagem de uma tela.
+
+Prevê-se a implementação de validação específica do conteúdo complementar das
+questões, conforme o tipo de interação declarado.
+
+Prevê-se a elaboração de testes automatizados. O projeto contempla atualmente
+apenas o teste padrão de inicialização, gerado automaticamente pela ferramenta.
+
+
+8.5 Considerações finais
+
+O sistema encontra-se em estágio de desenvolvimento intermediário. Seu núcleo
+funcional — autenticação, armazenamento do conteúdo educacional e registro
+corrigido das respostas dos alunos — está implementado e operacional, o que
+significa que o fluxo essencial da aplicação já pode ser exercitado de ponta a
+ponta.
+
+A arquitetura adotada demonstrou-se adequada aos objetivos do trabalho. A divisão
+em camadas e o agrupamento por funcionalidade permitiram que alterações
+significativas no modelo de progresso fossem realizadas sem repercussão sobre as
+demais partes do sistema. A opção por registrar cada tentativa de resposta, em vez
+de armazenar apenas indicadores consolidados, revelou-se acertada: os dados
+necessários aos indicadores de desempenho já estão sendo acumulados, restando
+apenas construir as consultas correspondentes.
+
+As lacunas identificadas concentram-se, majoritariamente, na camada de exposição
+da API — pontos de acesso construídos porém não disponibilizados, e consultas
+desativadas por conflito de endereçamento. Trata-se de lacunas de natureza
+predominantemente organizacional, e não conceitual, cuja resolução não demanda
+revisão da modelagem adotada.
+
+Ressalva-se, para fins de rigor acadêmico, que o sistema não se encontra em
+condições de operação em ambiente real. A ausência de perfis de acesso
+diferenciados, a exposição das respostas corretas nas consultas e a inexistência
+de testes automatizados constituem requisitos que precedem qualquer utilização com
+usuários reais. Tais pendências, entretanto, são compatíveis com o estágio de um
+trabalho acadêmico em desenvolvimento e encontram-se devidamente mapeadas para
+resolução.
+
+
+================================================================================
+ANEXO A — DIVERGÊNCIAS ENTRE O CONTRATO ESPERADO E O IMPLEMENTADO
+================================================================================
+
+Este anexo registra as divergências identificadas entre aquilo que o aplicativo
+espera receber do servidor e aquilo que o servidor efetivamente disponibiliza no
+estágio atual. Seu propósito é documentar os ajustes necessários à integração
+entre os dois componentes.
+
+
+A.1 Pontos de acesso esperados e não disponíveis
+
+O aplicativo pressupõe a existência de uma consulta que devolva os tópicos de uma
+determinada matéria. Essa consulta encontra-se desativada no servidor, conforme
+descrito na subseção 8.3. Sua ausência impede a navegação entre a tela de matérias
+e a tela de tópicos.
+
+O aplicativo pressupõe a existência de uma consulta que devolva as questões de um
+determinado tópico. O servidor disponibiliza uma consulta de formato semelhante,
+porém com significado diverso: o identificador informado é interpretado como
+identificador da questão, e não do tópico. A consulta filtrada por tópico existe
+na camada de serviço, mas não foi exposta.
+
+O aplicativo pressupõe a existência de uma consulta que devolva as alternativas de
+uma determinada questão. O servidor disponibiliza apenas a consulta que devolve
+todas as alternativas cadastradas, sem filtro.
+
+
+A.2 Divergências nos formatos de resposta
+
+Quanto aos dados do usuário, há correspondência integral entre o esperado e o
+entregue.
+
+Quanto às matérias, há correspondência integral entre o esperado e o entregue.
+
+Quanto aos tópicos, os campos existem conforme esperado, porém o percentual de
+conclusão e o estado do tópico são invariavelmente devolvidos como nulo e não
+iniciado, respectivamente, uma vez que o cálculo não está conectado ao registro de
+tentativas.
+
+Quanto às questões, verifica-se a divergência mais significativa. O aplicativo
+espera receber a indicação de conclusão e o nível de dificuldade da questão;
+nenhum dos dois existe atualmente na estrutura, ambos tendo sido removidos durante
+a reformulação do modelo. Em contrapartida, o servidor passou a devolver dois
+campos que o aplicativo desconhece: o tipo de interação e o conteúdo complementar,
+destinados a viabilizar formatos variados de exercício.
+
+Quanto às alternativas, os campos esperados existem. Registra-se, contudo, que a
+indicação de qual alternativa é correta, embora presente conforme esperado pelo
+aplicativo, configura a exposição de resposta discutida na subseção 5.6, cuja
+remoção consta entre as melhorias previstas. Recomenda-se que o aplicativo seja
+ajustado para não depender dessa informação.
+
+
+A.3 Divergência na configuração de conteinerização
+
+Os nomes das variáveis de ambiente declarados no arquivo de orquestração de
+contêineres não correspondem aos nomes efetivamente lidos pelo servidor, o que
+impediria a inicialização do sistema nesse modo de execução. A padronização desses
+nomes é requisito para a utilização do ambiente conteinerizado.
+
+
+================================================================================
+                              FIM DO DOCUMENTO
+================================================================================

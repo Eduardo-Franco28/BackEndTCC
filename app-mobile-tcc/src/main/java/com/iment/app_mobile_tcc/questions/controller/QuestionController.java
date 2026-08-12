@@ -24,4 +24,9 @@ public class QuestionController {
     public ResponseEntity<List<QuestionResponse>> getAll(){
         return ResponseEntity.ok(this.questionService.getAll());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<QuestionResponse> get(@PathVariable Long id){
+        return ResponseEntity.ok(this.questionService.get(id));
+    }
 }

@@ -1,4 +1,4 @@
-package com.iment.app_mobile_tcc.topics;
+package com.iment.app_mobile_tcc.topics.enums;
 
 public enum TopicStatusEnum {
     CONCLUIDO,

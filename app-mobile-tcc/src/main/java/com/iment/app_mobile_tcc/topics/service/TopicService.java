@@ -1,9 +1,13 @@
 package com.iment.app_mobile_tcc.topics.service;
 
+import com.iment.app_mobile_tcc.progress.service.QuestionProgressService;
+import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
+import com.iment.app_mobile_tcc.questions.entity.Question;
 import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.subjects.entity.Subject;
 import com.iment.app_mobile_tcc.subjects.repository.SubjectRepository;
-import com.iment.app_mobile_tcc.topics.TopicStatusEnum;
+import com.iment.app_mobile_tcc.topics.dto.response.ActivityResponse;
+import com.iment.app_mobile_tcc.topics.enums.TopicStatusEnum;
 import com.iment.app_mobile_tcc.topics.dto.request.TopicRequest;
 import com.iment.app_mobile_tcc.topics.dto.response.TopicResponse;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TopicService {
@@ -20,6 +25,9 @@ public class TopicService {
 
     @Autowired
     private QuestionService questionService;
+
+    @Autowired
+    private QuestionProgressService questionProgressService;
 
     @Autowired
     private SubjectRepository subjectRepository;
@@ -67,20 +75,45 @@ public class TopicService {
         this.topicRepository.delete(topic);
     }
 
-//    public List<TopicResponse> getBySubject(Long subjectId){ TODO
-//        List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
-//
-//        if(topics.isEmpty())
-//            throw new RuntimeException("Nenhum tópico encontrado");
-//
-//        return topics.stream()
-//        .map(topic -> {
+    public ActivityResponse getActivity(Long topicId, Long userId){
+        List<Question> lstQuestion = this.questionService.getAllByTopicId(topicId);
+
+        Set<Long> concludedIds = this.questionProgressService.getConcludedQuestionIds(userId, topicId);
+
+        List<QuestionResponse> lstQuestionResponse = lstQuestion.stream()
+                .map(question -> QuestionResponse.from(
+                        question,
+                        concludedIds.contains(question.getId())
+                ))
+                .toList();
+
+        Long resumeQuestionId = lstQuestion.stream()
+                .filter(question -> !concludedIds.contains(question.getId()))
+                .map(Question::getId)
+                .findFirst()
+                .orElse(null);
+
+
+        return new ActivityResponse(
+                resumeQuestionId,
+                lstQuestionResponse
+        );
+    }
+
+    public List<TopicResponse> getBySubject(Long subjectId){
+        List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
+
+        if(topics.isEmpty())
+            throw new RuntimeException("Nenhum tópico encontrado");
+
+        return topics.stream()
+        .map(topic -> {
 //            int percent = this.questionService.percentConclued(topic.getId());
 //            TopicStatusEnum status = this.setTopicStatus(percent);
-//            return TopicResponse.from(topic, percent, status);
-//        })
-//        .toList();
-//    }
+            return TopicResponse.from(topic, 0, TopicStatusEnum.NAO_INICIADO);
+        })
+        .toList();
+    }
 
 //    public TopicResponse get(Long id){
 //            Topic topic = this.topicRepository.findById(id).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));

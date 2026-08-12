@@ -1,9 +1,8 @@
 package com.iment.app_mobile_tcc.topics.dto.response;
 
 import com.iment.app_mobile_tcc.subjects.entity.Subject;
-import com.iment.app_mobile_tcc.topics.TopicStatusEnum;
+import com.iment.app_mobile_tcc.topics.enums.TopicStatusEnum;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
-import org.hibernate.id.IntegralDataTypeHolder;
 
 public record TopicResponse(Long id, String title, String subTitle, Subject subject, Integer percentConclued, TopicStatusEnum status) {
     public static TopicResponse from(Topic topic){

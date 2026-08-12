@@ -1,11 +1,14 @@
 package com.iment.app_mobile_tcc.topics.controller;
 
 import com.iment.app_mobile_tcc.topics.dto.request.TopicRequest;
+import com.iment.app_mobile_tcc.topics.dto.response.ActivityResponse;
 import com.iment.app_mobile_tcc.topics.dto.response.TopicResponse;
 import com.iment.app_mobile_tcc.topics.service.TopicService;
+import com.iment.app_mobile_tcc.users.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +40,18 @@ public class TopicController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/{subjectId}")
-//    public ResponseEntity<List<TopicResponse>> getBySubject(@PathVariable Long subjectId){
-//        List<TopicResponse> topics = this.topicService.getBySubject(subjectId);
-//
-//        return ResponseEntity.ok(topics);
-//    }
+    @GetMapping("/{id}/activity")
+    public ResponseEntity<ActivityResponse> getActivity(@PathVariable Long id,
+                                                        @AuthenticationPrincipal User user){
+        return ResponseEntity.ok(this.topicService.getActivity(id, user.getId()));
+    }
+
+    @GetMapping("/{subjectId}/subject")
+    public ResponseEntity<List<TopicResponse>> getBySubject(@PathVariable Long subjectId){
+        List<TopicResponse> topics = this.topicService.getBySubject(subjectId);
+
+        return ResponseEntity.ok(topics);
+    }
 
 
 //    @GetMapping("/{id}")

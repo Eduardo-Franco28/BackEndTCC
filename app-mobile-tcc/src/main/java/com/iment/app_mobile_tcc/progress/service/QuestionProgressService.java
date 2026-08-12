@@ -4,6 +4,8 @@ import com.iment.app_mobile_tcc.progress.repository.QuestionAttemptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class QuestionProgressService {
     @Autowired
@@ -12,5 +14,9 @@ public class QuestionProgressService {
     public boolean isCompleted(Long userId, Long questionId){
         return this.questionAttemptRepository
                 .existsByUserIdAndQuestionIdAndCorrectTrue(userId, questionId);
+    }
+
+    public Set<Long> getConcludedQuestionIds(Long userId, Long topicId){
+        return this.questionAttemptRepository.findConcludedQuestionIds(userId, topicId);
     }
 }

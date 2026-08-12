@@ -55,6 +55,18 @@ public class AlternativeService {
         }
     }
 
+    public List<AlternativeResponse> getAllByQuestionId(Long questionId){
+        try {
+            List<Alternative> lstAlternative = this.alternativeRepository.findAllByQuestionId(questionId);
+
+            return lstAlternative.stream()
+                    .map(AlternativeResponse::from)
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao buscar as alternativas da questão", e);
+        }
+    }
+
     public Alternative getAlternative(Long id){
         return this.alternativeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Altenrativa não encontrada"));
