@@ -26,7 +26,7 @@ public class AttemptService {
     private QuestionProgressService questionProgressService;
 
     public AnsweredAlternativeResponse save(User user, AttemptAlternativeRequest obj){
-        List<Alternative> lstAlternative = this.alternativeService.getAlternatives(obj.alternativesId());
+        List<Alternative> lstAlternative = this.alternativeService.getAlternatives(obj.lstAlternativeId());
 
         Question question = lstAlternative.get(0).getQuestion();
 
