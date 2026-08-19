@@ -1,7 +1,8 @@
 package com.iment.app_mobile_tcc.users.controller;
 
 import com.iment.app_mobile_tcc.auth.security.TokenService;
-import com.iment.app_mobile_tcc.users.dto.request.ChangeUserRequest;
+import com.iment.app_mobile_tcc.users.dto.request.UserPasswordRequest;
+import com.iment.app_mobile_tcc.users.dto.request.UserProfileRequest;
 import com.iment.app_mobile_tcc.users.dto.request.LoginRequest;
 import com.iment.app_mobile_tcc.users.dto.request.RegisterRequest;
 import com.iment.app_mobile_tcc.users.dto.response.AuthResponse;
@@ -67,24 +68,49 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, UserResponse.from(newUser)));
     }
 
-    @PatchMapping("/password")
-    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal User user, @RequestBody ChangeUserRequest request){
+    @PatchMapping("/profile")
+    public ResponseEntity<AuthResponse> updateProfile(@AuthenticationPrincipal User user, @RequestBody UserProfileRequest request){
+        if(request.currentPassword() == null || request.currentPassword().isBlank())
+            throw new RuntimeException("Informe a senha atual");
+
+        if(request.nome() == null && request.email() == null)
+            throw new RuntimeException("Informe um dado para alterar");
+
+        if (request.email() != null && !request.email().isBlank()) {
+            var existingUser = this.userRepository.findByEmail(request.email());
+
+            if (existingUser.isPresent() && !existingUser.get().getId().equals(user.getId()))
+                throw new RuntimeException("Esse email já está em uso");
+        }
+
         if(!this.passwordEncoder.matches(request.currentPassword(), user.getPassword()))
             throw new RuntimeException("A senha atual está incorreta");
-
-        if(request.email() != null
-                && !request.email().equalsIgnoreCase(user.getEmail())
-                && this.userRepository.findByEmail(request.email()).isPresent())
-            throw new RuntimeException("Esse email já está em uso");
 
         if(request.nome() != null && !request.nome().isBlank())
             user.setNome(request.nome());
 
-        if(request.newPassword() != null && !request.newPassword().isBlank())
-            user.setPassword(this.passwordEncoder.encode(request.newPassword()));
-
         if(request.email() != null && !request.email().isBlank())
             user.setEmail(request.email());
+
+        this.userRepository.save(user);
+
+        String token = this.tokenService.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(token, UserResponse.from(user)));
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<AuthResponse> updatePassword(@AuthenticationPrincipal User user, @RequestBody UserPasswordRequest request){
+        if(request.currentPassword() == null || request.currentPassword().isBlank())
+            throw new RuntimeException("Informe a senha atual");
+
+        if(!this.passwordEncoder.matches(request.currentPassword(), user.getPassword()))
+            throw new RuntimeException("A senha atual está incorreta");
+
+        if(request.newPassword() == null && request.newPassword().isBlank())
+            throw new RuntimeException("Informe a nova senha");
+
+        user.setPassword(this.passwordEncoder.encode(request.newPassword()));
 
         this.userRepository.save(user);
 
