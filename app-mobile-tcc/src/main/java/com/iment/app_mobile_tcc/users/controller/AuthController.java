@@ -1,8 +1,8 @@
 package com.iment.app_mobile_tcc.users.controller;
 
 import com.iment.app_mobile_tcc.auth.security.TokenService;
-import com.iment.app_mobile_tcc.users.dto.request.UserPasswordRequest;
-import com.iment.app_mobile_tcc.users.dto.request.UserProfileRequest;
+import com.iment.app_mobile_tcc.users.dto.request.NewPasswordRequest;
+import com.iment.app_mobile_tcc.users.dto.request.NewProfileRequest;
 import com.iment.app_mobile_tcc.users.dto.request.LoginRequest;
 import com.iment.app_mobile_tcc.users.dto.request.RegisterRequest;
 import com.iment.app_mobile_tcc.users.dto.response.AuthResponse;
@@ -69,7 +69,7 @@ public class AuthController {
     }
 
     @PatchMapping("/profile")
-    public ResponseEntity<AuthResponse> updateProfile(@AuthenticationPrincipal User user, @RequestBody UserProfileRequest request){
+    public ResponseEntity<AuthResponse> updateProfile(@AuthenticationPrincipal User user, @RequestBody NewProfileRequest request){
         if(request.currentPassword() == null || request.currentPassword().isBlank())
             throw new RuntimeException("Informe a senha atual");
 
@@ -100,7 +100,7 @@ public class AuthController {
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<AuthResponse> updatePassword(@AuthenticationPrincipal User user, @RequestBody UserPasswordRequest request){
+    public ResponseEntity<AuthResponse> updatePassword(@AuthenticationPrincipal User user, @RequestBody NewPasswordRequest request){
         if(request.currentPassword() == null || request.currentPassword().isBlank())
             throw new RuntimeException("Informe a senha atual");
 

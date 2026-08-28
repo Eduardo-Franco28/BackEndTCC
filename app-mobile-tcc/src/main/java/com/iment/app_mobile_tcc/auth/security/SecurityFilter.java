@@ -29,8 +29,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token != null){
             var email = this.tokenService.validateToken(token);
 
-            // token invalido ou usuario inexistente: segue sem autenticar,
-            // quem decide o 401 e o Spring Security
             if(email != null && !email.isBlank()){
                 this.userRepository.findByEmail(email).ifPresent(user -> {
                     var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
