@@ -11,6 +11,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("""
         SELECT DISTINCT q FROM Question q
         LEFT JOIN FETCH q.lstAlternative
+        LEFT JOIN FETCH q.board
         WHERE q.topic.id = :topicId
         ORDER BY q.level
         """)

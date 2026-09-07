@@ -1,60 +1,68 @@
 package com.iment.app_mobile_tcc.progress.service;
 
-import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
-import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
+import com.iment.app_mobile_tcc.progress.dto.correction.CorrectionResult;
 import com.iment.app_mobile_tcc.progress.dto.request.AttemptAlternativeRequest;
 import com.iment.app_mobile_tcc.progress.dto.response.AnsweredAlternativeResponse;
 import com.iment.app_mobile_tcc.progress.entity.QuestionAttempt;
 import com.iment.app_mobile_tcc.progress.repository.QuestionAttemptRepository;
 import com.iment.app_mobile_tcc.questions.entity.Question;
+import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
+import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.users.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
 @Service
 public class AttemptService {
+
     @Autowired
     private QuestionAttemptRepository questionAttemptRepository;
 
     @Autowired
-    private AlternativeService alternativeService;
-
-    @Autowired
     private QuestionProgressService questionProgressService;
 
-    public AnsweredAlternativeResponse save(User user, AttemptAlternativeRequest obj){
-        List<Alternative> lstAlternative = this.alternativeService.getAlternatives(obj.lstAlternativeId());
+    @Autowired
+    private QuestionService questionService;
 
-        Question question = lstAlternative.get(0).getQuestion();
+    @Autowired
+    private CorrectionService correctionService;
 
-        int allCorrects = 0;
-        boolean missQuestion = false;
+    public AnsweredAlternativeResponse save(User user, AttemptAlternativeRequest obj) {
 
-        for (Alternative alternative : lstAlternative){
-            if(alternative.isCorrect())
-                allCorrects++;
-            else
-                missQuestion = true;
-        }
+        // Busca pelo id que veio no request, e não pela primeira alternativa
+        // como era antes. Assim funciona quando lstAlternativeId é nulo (o
+        // caso do arrastar), não estoura com lista vazia, e as validações da
+        // correção passam a ter contra o que comparar.
+        Question question = this.questionService.getQuestion(obj.questionId());
 
-        Long totalCorrects = this.alternativeService.countCorrectAlternativesByQuestion(obj.questionId());
+        CorrectionResult result;
 
-        boolean correctQuestion = !missQuestion && allCorrects == totalCorrects;
+        // As regras do jogo moram no CorrectionService. Aqui é só o fluxo.
+        if (question.getType() == QuestionTypeEnum.DRAG_TO_SLOTS)
+            result = this.correctionService.bySlots(question, obj);
+        else
+            result = this.correctionService.byAlternatives(question, obj);
 
+        // Grava acertando ou errando. É esse histórico que alimenta o
+        // percentual do tópico e o resumeQuestionId.
         this.questionAttemptRepository.save(new QuestionAttempt(
                 null,
                 user,
                 question,
-                correctQuestion,
+                result.correct(),
                 Instant.now()
         ));
 
-        boolean questionConcluded = correctQuestion
+        // Concluída se acertou agora, ou se já tinha acertado antes.
+        boolean questionConcluded = result.correct()
                 || this.questionProgressService.isCompleted(user.getId(), obj.questionId());
 
-        return new AnsweredAlternativeResponse(correctQuestion, questionConcluded);
+        return new AnsweredAlternativeResponse(
+                result.correct(),
+                questionConcluded,
+                result.lstWrongSlots()
+        );
     }
 }

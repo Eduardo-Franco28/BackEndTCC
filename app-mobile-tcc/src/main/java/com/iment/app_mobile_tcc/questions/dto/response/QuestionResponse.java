@@ -8,7 +8,7 @@ import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
-public record QuestionResponse(Long id, String title, Topic topic, Integer level, QuestionTypeEnum type, String content, List<AlternativeResponse> lstAlternative , boolean conclued) {
+public record QuestionResponse(Long id, String title, Topic topic, Integer level, QuestionTypeEnum type, String content, BoardResponse board, List<AlternativeResponse> lstAlternative , boolean conclued) {
     public static QuestionResponse from(Question question, boolean conclued){
         return new QuestionResponse(
                 question.getId(),
@@ -17,6 +17,7 @@ public record QuestionResponse(Long id, String title, Topic topic, Integer level
                 question.getLevel(),
                 question.getType(),
                 question.getContent(),
+                question.getBoard() == null ? null : BoardResponse.from(question.getBoard()),
                 question.getLstAlternative().stream().map(AlternativeResponse::from).toList(),
                 conclued
         );

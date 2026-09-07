@@ -41,4 +41,8 @@ public class Question {
 
     @OneToMany(mappedBy = "question")
     private List<Alternative> lstAlternative;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 }

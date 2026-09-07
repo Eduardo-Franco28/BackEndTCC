@@ -34,7 +34,8 @@ public class AlternativeService {
                     null,
                     obj.description(),
                     obj.correct(),
-                    question
+                    question,
+                    obj.correctSlot()
             );
 
             return AlternativeResponse.from(this.alternativeRepository.save(alternative));

@@ -5,7 +5,9 @@ import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
 import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
 import com.iment.app_mobile_tcc.questions.dto.request.QuestionRequest;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
+import com.iment.app_mobile_tcc.questions.entity.Board;
 import com.iment.app_mobile_tcc.questions.entity.Question;
+import com.iment.app_mobile_tcc.questions.repository.BoardRepository;
 import com.iment.app_mobile_tcc.questions.repository.QuestionRepository;
 import com.iment.app_mobile_tcc.subjects.entity.Subject;
 import com.iment.app_mobile_tcc.topics.dto.request.TopicRequest;
@@ -29,6 +31,9 @@ public class QuestionService {
     @Autowired
     private AlternativeService alternativeService;
 
+    @Autowired
+    private BoardRepository boardRepository;
+
     public QuestionResponse create(QuestionRequest obj) {
         if(obj.title() == null || obj.title().isBlank())
             throw new RuntimeException("O nome do tópico não pode vir vazio");
@@ -38,6 +43,12 @@ public class QuestionService {
 
         Topic topic = this.topicRepository.findById(obj.topicId()).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
 
+        Board board = null;
+
+        if(obj.boardId() != null)
+            board = this.boardRepository.findById(obj.boardId())
+                    .orElseThrow(() -> new RuntimeException("Board não encontrado"));
+
         try {
             Question question = new Question(
                     null,
@@ -46,7 +57,8 @@ public class QuestionService {
                     obj.level(),
                     obj.type(),
                     obj.content().toString(),
-                    List.of()
+                    List.of(),
+                    board
             );
 
             return QuestionResponse.from(this.questionRepository.save(question), false);

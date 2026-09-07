@@ -28,4 +28,6 @@ public class Alternative {
     @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
+
+    private String correctSlot;
 }
