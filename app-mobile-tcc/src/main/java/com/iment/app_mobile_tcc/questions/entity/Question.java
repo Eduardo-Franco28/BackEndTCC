@@ -33,7 +33,7 @@ public class Question {
     private Integer level;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "smallint")
     private QuestionTypeEnum type;
 
     @Column(columnDefinition = "TEXT", nullable = false)

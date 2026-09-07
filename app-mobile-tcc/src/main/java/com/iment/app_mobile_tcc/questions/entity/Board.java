@@ -23,8 +23,9 @@ public class Board {
     @Column(nullable = false)
     private String viewBox;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String slots;
 
+    @Column(nullable = false)
     private boolean allowMultiple;
 }
