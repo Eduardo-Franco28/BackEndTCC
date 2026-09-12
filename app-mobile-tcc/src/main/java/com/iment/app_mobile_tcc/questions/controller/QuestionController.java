@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/question")
+@RequestMapping("/questions")
 public class QuestionController {
     @Autowired
     private QuestionService questionService;
@@ -18,6 +18,11 @@ public class QuestionController {
     @PostMapping
     public ResponseEntity<QuestionResponse> create(@RequestBody QuestionRequest request){
         return ResponseEntity.ok(this.questionService.create(request));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<QuestionResponse> update(@PathVariable Long id, @RequestBody QuestionRequest request){
+        return ResponseEntity.ok(this.questionService.update(id, request));
     }
 
     @GetMapping

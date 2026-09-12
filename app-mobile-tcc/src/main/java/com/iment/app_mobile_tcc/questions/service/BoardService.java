@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class BoardService {
@@ -34,6 +35,29 @@ public class BoardService {
             return BoardResponse.from(this.boardRepository.save(board));
         } catch (Exception e){
             throw new RuntimeException("Falha na criação do board", e);
+        }
+    }
+
+    /**
+     * Lista os tabuleiros cadastrados.
+     *
+     * Serve pra cadastrar uma questao: sem isso nao ha como descobrir o id de
+     * um board pra passar no boardId da QuestionRequest.
+     */
+    public List<BoardResponse> getAll(){
+        return this.boardRepository.findAll().stream()
+                .map(BoardResponse::from)
+                .toList();
+    }
+
+    public List<BoardSlot> readSlots(Board board){
+
+        if (board == null) return List.of();
+
+        try {
+            return List.of(this.objectMapper.readValue(board.getSlots(), BoardSlot[].class));
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Falha na leitura dos boards: ", e);
         }
     }
 

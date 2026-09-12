@@ -1,4 +1,4 @@
-package com.iment.app_mobile_tcc.auth.security;
+package com.iment.app_mobile_tcc.shared.security;
 
 import com.iment.app_mobile_tcc.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

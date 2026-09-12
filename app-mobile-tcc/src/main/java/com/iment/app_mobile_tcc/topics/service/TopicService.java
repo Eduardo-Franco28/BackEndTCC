@@ -3,6 +3,7 @@ package com.iment.app_mobile_tcc.topics.service;
 import com.iment.app_mobile_tcc.progress.service.QuestionProgressService;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
+import com.iment.app_mobile_tcc.questions.service.BoardService;
 import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.subjects.entity.Subject;
 import com.iment.app_mobile_tcc.subjects.repository.SubjectRepository;
@@ -31,6 +32,9 @@ public class TopicService {
 
     @Autowired
     private SubjectRepository subjectRepository;
+
+    @Autowired
+    private BoardService boardService;
 
     public TopicResponse create(TopicRequest obj) {
         if(obj.title() == null || obj.title().isBlank())
@@ -83,7 +87,8 @@ public class TopicService {
         List<QuestionResponse> lstQuestionResponse = lstQuestion.stream()
                 .map(question -> QuestionResponse.from(
                         question,
-                        concludedIds.contains(question.getId())
+                        concludedIds.contains(question.getId()),
+                        this.boardService.readSlots(question.getBoard())
                 ))
                 .toList();
 

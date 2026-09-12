@@ -1,6 +1,6 @@
 package com.iment.app_mobile_tcc.users.controller;
 
-import com.iment.app_mobile_tcc.auth.security.TokenService;
+import com.iment.app_mobile_tcc.shared.security.TokenService;
 import com.iment.app_mobile_tcc.users.dto.request.NewPasswordRequest;
 import com.iment.app_mobile_tcc.users.dto.request.NewProfileRequest;
 import com.iment.app_mobile_tcc.users.dto.request.LoginRequest;

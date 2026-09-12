@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("alternative")
+@RequestMapping("alternatives")
 public class AlternativeController {
     @Autowired
     private AlternativeService alternativeService;
@@ -21,6 +21,11 @@ public class AlternativeController {
     @PostMapping
     public ResponseEntity<AlternativeResponse> create(@RequestBody AlternativeRequest request){
         return ResponseEntity.ok(this.alternativeService.create(request));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AlternativeResponse> update(@PathVariable Long id, @RequestBody AlternativeRequest request){
+        return ResponseEntity.ok(this.alternativeService.update(id, request));
     }
 
     @GetMapping

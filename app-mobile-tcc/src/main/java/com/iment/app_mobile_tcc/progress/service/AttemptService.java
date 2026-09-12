@@ -30,11 +30,6 @@ public class AttemptService {
     private CorrectionService correctionService;
 
     public AnsweredAlternativeResponse save(User user, AttemptAlternativeRequest obj) {
-
-        // Busca pelo id que veio no request, e não pela primeira alternativa
-        // como era antes. Assim funciona quando lstAlternativeId é nulo (o
-        // caso do arrastar), não estoura com lista vazia, e as validações da
-        // correção passam a ter contra o que comparar.
         Question question = this.questionService.getQuestion(obj.questionId());
 
         CorrectionResult result;

@@ -30,4 +30,10 @@ public class Alternative {
     private Question question;
 
     private String correctSlot;
+
+    /**
+     * Emoji ou sigla que a peca mostra, quando ela nao e um desenho SVG.
+     * E o caso dos animais: o golfinho aparece como um emoji, nao como path.
+     */
+    private String icon;
 }

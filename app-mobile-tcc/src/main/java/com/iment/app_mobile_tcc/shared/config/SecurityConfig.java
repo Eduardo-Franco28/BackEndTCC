@@ -1,6 +1,6 @@
 package com.iment.app_mobile_tcc.shared.config;
 
-import com.iment.app_mobile_tcc.auth.security.SecurityFilter;
+import com.iment.app_mobile_tcc.shared.security.SecurityFilter;
 import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

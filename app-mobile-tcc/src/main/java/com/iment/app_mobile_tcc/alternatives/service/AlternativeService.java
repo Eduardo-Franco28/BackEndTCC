@@ -35,12 +35,32 @@ public class AlternativeService {
                     obj.description(),
                     obj.correct(),
                     question,
-                    obj.correctSlot()
+                    obj.correctSlot(),
+                    obj.icon()
             );
 
             return AlternativeResponse.from(this.alternativeRepository.save(alternative));
         } catch (Exception e){
             throw new RuntimeException("Falha na criação da alternativa", e);
+        }
+    }
+
+    public AlternativeResponse update(Long id, AlternativeRequest obj) {
+        if(obj.description() == null || obj.description().isBlank())
+            throw new RuntimeException("A alternativa precisa de um valor");
+
+        Alternative alternative = this.alternativeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Alternativa não encontrada"));
+
+        try {
+            alternative.setDescription(obj.description());
+            alternative.setCorrect(obj.correct());
+            alternative.setCorrectSlot(obj.correctSlot());
+            alternative.setIcon(obj.icon());
+
+            return AlternativeResponse.from(this.alternativeRepository.save(alternative));
+        } catch (Exception e){
+            throw new RuntimeException("Falha na alteração da alternativa", e);
         }
     }
 

@@ -61,9 +61,40 @@ public class QuestionService {
                     board
             );
 
-            return QuestionResponse.from(this.questionRepository.save(question), false);
+            return QuestionResponse.from(this.questionRepository.save(question), false, null);
         } catch (Exception e){
             throw new RuntimeException("Falha na criação da questão", e);
+        }
+    }
+
+    public QuestionResponse update(Long id, QuestionRequest obj) {
+        if(obj.title() == null || obj.title().isBlank())
+            throw new RuntimeException("O nome da questão não pode vir vazio");
+
+        if(obj.content() == null)
+            throw new RuntimeException("A atividade precisa de conteúdo");
+
+        Question question = this.getQuestion(id);
+
+        try {
+            question.setTitle(obj.title());
+            question.setLevel(obj.level());
+            question.setType(obj.type());
+            question.setContent(obj.content().toString());
+
+            // Board nulo é legítimo: palavra e animais não têm desenho.
+            question.setBoard(
+                    obj.boardId() == null
+                            ? null
+                            : this.boardRepository.findById(obj.boardId())
+                                    .orElseThrow(() -> new RuntimeException("Board não encontrado"))
+            );
+
+            Question updatedQuestion = this.questionRepository.save(question);
+
+            return QuestionResponse.from(updatedQuestion, false, null);
+        } catch (Exception e) {
+            throw new RuntimeException("Falha na alteração da questão", e);
         }
     }
 
@@ -72,7 +103,7 @@ public class QuestionService {
             List<Question> lstQuestion = this.questionRepository.findAll();
 
             return lstQuestion.stream()
-                    .map(question -> QuestionResponse.from(question,false))
+                    .map(question -> QuestionResponse.from(question,false, null))
                     .toList();
         } catch (Exception e) {
             throw new RuntimeException("Falha ao buscar as questões", e);
@@ -84,7 +115,7 @@ public class QuestionService {
 
         List<AlternativeResponse> lstAlternative = this.alternativeService.getAllByQuestionId(id);
 
-        return QuestionResponse.from(question, false);
+        return QuestionResponse.from(question, false, null);
     }
 
     public List<Question> getAllByTopicId(Long topicId){

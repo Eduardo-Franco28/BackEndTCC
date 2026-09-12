@@ -1,4 +1,4 @@
-package com.iment.app_mobile_tcc.auth.security;
+package com.iment.app_mobile_tcc.shared.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
