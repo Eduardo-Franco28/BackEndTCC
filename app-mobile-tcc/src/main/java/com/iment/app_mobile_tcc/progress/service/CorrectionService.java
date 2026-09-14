@@ -32,7 +32,7 @@ public class CorrectionService {
     private AlternativeService alternativeService;
 
     // ==================================================================
-    // Atividades de arrastar: palavra, mapa, corpo e animais
+    // Atividades de arrastar: encaixar formas, completar sequência, classificar
     // ==================================================================
 
     public CorrectionResult bySlots(Question question, AttemptAlternativeRequest obj) {
@@ -43,9 +43,12 @@ public class CorrectionService {
         Set<String> emptySlots = this.getEmptySlots(content);
         Map<Long, Alternative> pieces = this.getPiecesById(question);
 
-        // Um mesmo lugar aceita mais de uma peça? É o caso dos animais, onde o
+        // Um mesmo lugar aceita mais de uma peça? É o caso de classificar, onde o
         // mar recebe golfinho e peixe. Muda duas regras daqui pra baixo.
-        boolean allowMultiple = Boolean.TRUE.equals(content.allowMultiple());
+        //
+        // Quem responde é o TIPO da questão, que está no banco. O app não manda
+        // essa informação — senão daria pra burlar a correção.
+        boolean allowMultiple = question.getType().isAllowMultiple();
 
         this.validateSlots(placed, emptySlots, pieces, allowMultiple);
 
@@ -103,7 +106,7 @@ public class CorrectionService {
     /**
      * A criança terminou de montar?
      *
-     * Com um lugar por peça (palavra, mapa, corpo), terminar é ter preenchido
+     * Com um lugar por peça (encaixar, completar), terminar é ter preenchido
      * todo buraco vazio. As letras distratoras ficam de fora e tudo bem.
      *
      * Quando um lugar aceita várias peças, o número de peças não tem relação
@@ -121,12 +124,8 @@ public class CorrectionService {
 
     /**
      * Duas peças no mesmo lugar.
-     * Proibido no corpo, no mapa e na palavra; permitido nos animais, onde o mar
-     * recebe golfinho e peixe.
-     *
-     * A permissão vem do `content` da questão, não do board: os animais não têm
-     * board nenhum, e ainda assim precisam da regra. O Board.allowMultiple
-     * continua na tabela mas ninguém mais o lê.
+     * Proibido em encaixar formas e completar sequência; permitido em classificar,
+     * onde o mar recebe golfinho e peixe. Quem decide é o tipo da questão.
      */
     private void validateOnePiecePerSlot(List<FilledSlot> placed, boolean allowMultiple) {
 

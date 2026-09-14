@@ -1,6 +1,7 @@
 package com.iment.app_mobile_tcc.questions.entity;
 
 import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
+import com.iment.app_mobile_tcc.boards.entity.Board;
 import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
 import jakarta.persistence.*;

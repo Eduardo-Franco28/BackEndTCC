@@ -6,7 +6,6 @@ import com.iment.app_mobile_tcc.progress.dto.response.AnsweredAlternativeRespons
 import com.iment.app_mobile_tcc.progress.entity.QuestionAttempt;
 import com.iment.app_mobile_tcc.progress.repository.QuestionAttemptRepository;
 import com.iment.app_mobile_tcc.questions.entity.Question;
-import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
 import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.users.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,8 @@ public class AttemptService {
         CorrectionResult result;
 
         // As regras do jogo moram no CorrectionService. Aqui é só o fluxo.
-        if (question.getType() == QuestionTypeEnum.DRAG_TO_SLOTS)
+        // O próprio tipo diz como ele é corrigido: tipo novo não mexe aqui.
+        if (question.getType().isSlotBased())
             result = this.correctionService.bySlots(question, obj);
         else
             result = this.correctionService.byAlternatives(question, obj);

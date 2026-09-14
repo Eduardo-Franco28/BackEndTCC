@@ -1,7 +1,7 @@
 package com.iment.app_mobile_tcc.alternatives.dto.response;
 
 import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
-import com.iment.app_mobile_tcc.questions.dto.content.BoardSlot;
+import com.iment.app_mobile_tcc.boards.dto.content.BoardSlot;
 
 import java.util.List;
 

@@ -1,17 +1,13 @@
 package com.iment.app_mobile_tcc.questions.service;
 
 import com.iment.app_mobile_tcc.alternatives.dto.response.AlternativeResponse;
-import com.iment.app_mobile_tcc.alternatives.entity.Alternative;
 import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
 import com.iment.app_mobile_tcc.questions.dto.request.QuestionRequest;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
-import com.iment.app_mobile_tcc.questions.entity.Board;
+import com.iment.app_mobile_tcc.boards.entity.Board;
 import com.iment.app_mobile_tcc.questions.entity.Question;
-import com.iment.app_mobile_tcc.questions.repository.BoardRepository;
+import com.iment.app_mobile_tcc.boards.repository.BoardRepository;
 import com.iment.app_mobile_tcc.questions.repository.QuestionRepository;
-import com.iment.app_mobile_tcc.subjects.entity.Subject;
-import com.iment.app_mobile_tcc.topics.dto.request.TopicRequest;
-import com.iment.app_mobile_tcc.topics.dto.response.TopicResponse;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
 import com.iment.app_mobile_tcc.topics.repository.TopicRepository;
 import jakarta.persistence.EntityNotFoundException;

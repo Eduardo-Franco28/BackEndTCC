@@ -1,11 +1,11 @@
 package com.iment.app_mobile_tcc.questions.dto.response;
 
 import com.iment.app_mobile_tcc.alternatives.dto.response.AlternativeResponse;
-import com.iment.app_mobile_tcc.questions.dto.content.BoardSlot;
+import com.iment.app_mobile_tcc.boards.dto.content.BoardSlot;
+import com.iment.app_mobile_tcc.boards.dto.response.BoardResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
 import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
-import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 

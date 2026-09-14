@@ -1,4 +1,4 @@
-package com.iment.app_mobile_tcc.questions.entity;
+package com.iment.app_mobile_tcc.boards.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,4 @@ public class Board {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String slots;
-
-    @Column(nullable = false)
-    private boolean allowMultiple;
 }

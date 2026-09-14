@@ -19,4 +19,8 @@ public class QuestionProgressService {
     public Set<Long> getConcludedQuestionIds(Long userId, Long topicId){
         return this.questionAttemptRepository.findConcludedQuestionIds(userId, topicId);
     }
+
+    public Set<Long> getAllConcludedQuestionIds(Long userId){
+        return this.questionAttemptRepository.findAllConcludedQuestionIds(userId);
+    }
 }

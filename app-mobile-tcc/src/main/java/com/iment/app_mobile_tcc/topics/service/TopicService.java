@@ -3,7 +3,7 @@ package com.iment.app_mobile_tcc.topics.service;
 import com.iment.app_mobile_tcc.progress.service.QuestionProgressService;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
-import com.iment.app_mobile_tcc.questions.service.BoardService;
+import com.iment.app_mobile_tcc.boards.service.BoardService;
 import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.subjects.entity.Subject;
 import com.iment.app_mobile_tcc.subjects.repository.SubjectRepository;

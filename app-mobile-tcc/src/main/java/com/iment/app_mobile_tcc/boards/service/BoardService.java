@@ -1,10 +1,10 @@
-package com.iment.app_mobile_tcc.questions.service;
+package com.iment.app_mobile_tcc.boards.service;
 
-import com.iment.app_mobile_tcc.questions.dto.content.BoardSlot;
-import com.iment.app_mobile_tcc.questions.dto.request.BoardRequest;
-import com.iment.app_mobile_tcc.questions.dto.response.BoardResponse;
-import com.iment.app_mobile_tcc.questions.entity.Board;
-import com.iment.app_mobile_tcc.questions.repository.BoardRepository;
+import com.iment.app_mobile_tcc.boards.dto.content.BoardSlot;
+import com.iment.app_mobile_tcc.boards.dto.request.BoardRequest;
+import com.iment.app_mobile_tcc.boards.dto.response.BoardResponse;
+import com.iment.app_mobile_tcc.boards.entity.Board;
+import com.iment.app_mobile_tcc.boards.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
@@ -28,8 +28,7 @@ public class BoardService {
                     null,
                     request.name(),
                     request.viewBox(),
-                    this.objectMapper.writeValueAsString(request.slots()),
-                    request.allowMultiple()
+                    this.objectMapper.writeValueAsString(request.slots())
             );
 
             return BoardResponse.from(this.boardRepository.save(board));

@@ -19,4 +19,11 @@ public interface QuestionAttemptRepository extends JpaRepository<QuestionAttempt
         AND qa.correct = true
         """)
     Set<Long> findConcludedQuestionIds(@Param("userId") Long userId, @Param("topicId") Long topicId);
+
+    @Query("""
+        SELECT DISTINCT qa.question.id FROM QuestionAttempt qa
+        WHERE qa.user.id = :userId
+        AND qa.correct = true
+        """)
+    Set<Long> findAllConcludedQuestionIds(@Param("userId") Long userId);
 }
