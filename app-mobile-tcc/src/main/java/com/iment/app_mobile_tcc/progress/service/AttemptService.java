@@ -20,7 +20,7 @@ public class AttemptService {
     private QuestionAttemptRepository questionAttemptRepository;
 
     @Autowired
-    private QuestionProgressService questionProgressService;
+    private ProgressService progressService;
 
     @Autowired
     private QuestionService questionService;
@@ -52,7 +52,7 @@ public class AttemptService {
 
         // Concluída se acertou agora, ou se já tinha acertado antes.
         boolean questionConcluded = result.correct()
-                || this.questionProgressService.isCompleted(user.getId(), obj.questionId());
+                || this.progressService.isCompleted(user.getId(), obj.questionId());
 
         return new AnsweredAlternativeResponse(
                 result.correct(),

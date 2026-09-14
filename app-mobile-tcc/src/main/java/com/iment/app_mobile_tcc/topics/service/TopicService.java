@@ -1,6 +1,6 @@
 package com.iment.app_mobile_tcc.topics.service;
 
-import com.iment.app_mobile_tcc.progress.service.QuestionProgressService;
+import com.iment.app_mobile_tcc.progress.service.ProgressService;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
 import com.iment.app_mobile_tcc.boards.service.BoardService;
@@ -13,9 +13,11 @@ import com.iment.app_mobile_tcc.topics.dto.request.TopicRequest;
 import com.iment.app_mobile_tcc.topics.dto.response.TopicResponse;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
 import com.iment.app_mobile_tcc.topics.repository.TopicRepository;
+import com.iment.app_mobile_tcc.users.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +30,7 @@ public class TopicService {
     private QuestionService questionService;
 
     @Autowired
-    private QuestionProgressService questionProgressService;
+    private ProgressService progressService;
 
     @Autowired
     private SubjectRepository subjectRepository;
@@ -82,7 +84,7 @@ public class TopicService {
     public ActivityResponse getActivity(Long topicId, Long userId){
         List<Question> lstQuestion = this.questionService.getAllByTopicId(topicId);
 
-        Set<Long> concludedIds = this.questionProgressService.getConcludedQuestionIds(userId, topicId);
+        Set<Long> concludedIds = this.progressService.getConcludedQuestionIds(userId, topicId);
 
         List<QuestionResponse> lstQuestionResponse = lstQuestion.stream()
                 .map(question -> QuestionResponse.from(
@@ -105,7 +107,7 @@ public class TopicService {
         );
     }
 
-    public List<TopicResponse> getBySubject(Long subjectId){
+    public List<TopicResponse> getBySubject(User user, Long subjectId){
         List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
 
         if(topics.isEmpty())
@@ -113,11 +115,24 @@ public class TopicService {
 
         return topics.stream()
         .map(topic -> {
-//            int percent = this.questionService.percentConclued(topic.getId());
-//            TopicStatusEnum status = this.setTopicStatus(percent);
-            return TopicResponse.from(topic, 0, TopicStatusEnum.NAO_INICIADO);
+              int percent = this.progressService.calcPercentConclued(user.getId(), topic.getId());
+            TopicStatusEnum status = this.setTopicStatus(percent);
+            return TopicResponse.from(topic, percent, status);
         })
         .toList();
+    }
+
+    public List<TopicResponse> getConcluded(User user) {
+        List<TopicResponse> concluded = new ArrayList<>();
+
+        for (Topic topic : this.topicRepository.findAll()) {
+            int percent = this.progressService.calcPercentConclued(user.getId(), topic.getId());
+
+            if (percent == 100)
+                concluded.add(TopicResponse.from(topic, percent, TopicStatusEnum.CONCLUIDO));
+        }
+
+        return concluded;
     }
 
 //    public TopicResponse get(Long id){

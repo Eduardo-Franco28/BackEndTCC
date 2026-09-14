@@ -47,8 +47,8 @@ public class TopicController {
     }
 
     @GetMapping("/{subjectId}/subject")
-    public ResponseEntity<List<TopicResponse>> getBySubject(@PathVariable Long subjectId){
-        List<TopicResponse> topics = this.topicService.getBySubject(subjectId);
+    public ResponseEntity<List<TopicResponse>> getBySubject(@AuthenticationPrincipal User user, @PathVariable Long subjectId){
+        List<TopicResponse> topics = this.topicService.getBySubject(user, subjectId);
 
         return ResponseEntity.ok(topics);
     }

@@ -122,6 +122,14 @@ public class QuestionService {
         }
     }
 
+    public long countAllByTopicId(Long topicId){
+        try {
+            return this.questionRepository.countAllByTopicId(topicId);
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao contar as questões", e);
+        }
+    }
+
     public Question getQuestion(Long id){
         return this.questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Questão não encontrada"));
