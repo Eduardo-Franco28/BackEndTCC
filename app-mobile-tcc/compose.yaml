@@ -2,7 +2,7 @@ services:
   postgres:
     image: 'postgres:18'
     container_name: tcc_bd
-    restart: always
+    restart: unless-stopped
     environment:
       - 'POSTGRES_DB=${POSTGRES_DB}'
       - 'POSTGRES_PASSWORD=${POSTGRES_PASSWORD}'
@@ -11,33 +11,33 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - tcc_network
-
+    healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+        interval: 5s
+        timeout: 5s
+        retries: 10
   backend:
     build: .
     container_name: tcc_backend
-
+    restart: unless-stopped
     depends_on:
-      - postgres
-
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
-
     environment:
       TCC_DATASOURCE_URL: ${TCC_DATASOURCE_URL}
       TCC_DATASOURCE_PASSWORD: ${TCC_DATASOURCE_PASSWORD}
       TCC_DATASOURCE_USERNAME: ${TCC_DATASOURCE_USERNAME}
       JWT_SECRET: ${JWT_SECRET}
-
-    networks:
-      - tcc_network
-
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c ':> /dev/tcp/localhost/8080' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 volumes:
   postgres_data:
-
-networks:
-  tcc_network:
 
 
 

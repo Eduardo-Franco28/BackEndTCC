@@ -11,7 +11,7 @@ RUN mvn clean package -DskipTests -B
 FROM eclipse-temurin:25-jre
 #Pega o java menor só pra rodar mesmo
 WORKDIR /app
-COPY --from=build /app/target/*.jar /app.jar
+COPY --from=build /app/target/*.jar app.jar
 #Só precisa do .jar pra rodar, não precisa chamar as dependências também
 EXPOSE 8080
 CMD ["java","-jar","app.jar"]
