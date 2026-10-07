@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,5 +52,29 @@ public class ProgressService {
         long concluededs = this.getConcludedQuestionIds(userId, topicId).size();
 
         return (int) (concluededs * 100 / total);
+    }
+
+    public int calcSequence(Long userId) {
+
+        List<Instant> lstDataAttempts = this.questionAttemptRepository.findAllAnsweredAtAttempts(userId);
+
+        int sequence = 0;
+        LocalDate referenceDay = LocalDate.now();
+
+        for (Instant dataAttempt : lstDataAttempts) {
+
+            LocalDate attemptDay =
+                    LocalDate.ofInstant(
+                            dataAttempt,
+                            ZoneId.of("America/Sao_Paulo")
+                    );
+
+            if (attemptDay.equals(referenceDay)) {
+                sequence++;
+                referenceDay = referenceDay.minusDays(1);
+            }
+        }
+
+        return sequence;
     }
 }

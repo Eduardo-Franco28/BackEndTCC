@@ -1,20 +1,17 @@
 FROM maven:3.9-eclipse-temurin-25 AS build
-
-COPY src /app/src
-COPY pom.xml /app
-
 WORKDIR /app
 
-RUN mvn clean package -DskipTests
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-FROM eclipse-temurin:25-jdk
+COPY src ./src
+RUN mvn clean package -DskipTests -B
+#Aqui ele cria o .jar com tudo já
 
+FROM eclipse-temurin:25-jre
+#Pega o java menor só pra rodar mesmo
 WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
+COPY --from=build /app/target/*.jar /app.jar
+#Só precisa do .jar pra rodar, não precisa chamar as dependências também
 EXPOSE 8080
-
-ENTRYPOINT ["java","-jar","app.jar"]
-
 CMD ["java","-jar","app.jar"]

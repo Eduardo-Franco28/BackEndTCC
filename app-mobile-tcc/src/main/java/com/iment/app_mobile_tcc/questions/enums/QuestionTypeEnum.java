@@ -4,7 +4,8 @@ public enum QuestionTypeEnum {
     DRAG_DOTS(false, false),
     DRAG_TO_SLOTS(true, false),
     DRAG_LETTERS(true, false),
-    DRAG_SLOTS_TO_GROUP(true, true);
+    DRAG_SLOTS_TO_GROUP(true, true),
+    DRAG_SUBTRACTION(false, false);
 
     private final boolean slotBased;
     private final boolean allowMultiple;

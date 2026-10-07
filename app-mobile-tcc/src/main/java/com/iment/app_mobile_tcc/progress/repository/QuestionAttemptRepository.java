@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -41,4 +42,11 @@ public interface QuestionAttemptRepository extends JpaRepository<QuestionAttempt
         ORDER BY MAX(qa.answeredAt) DESC
     """)
     List<Question> findLastUnfinishedQuestions(@Param("userId") Long userId, Limit limit);
+
+    @Query("""
+        SELECT qa.answeredAt FROM QuestionAttempt qa
+        WHERE qa.user.id = :userId
+        ORDER BY qa.answeredAt DESC
+    """)
+    List<Instant> findAllAnsweredAtAttempts(@Param("userId") Long userId);
 }

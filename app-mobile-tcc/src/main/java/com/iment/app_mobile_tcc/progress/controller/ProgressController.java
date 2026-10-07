@@ -38,4 +38,9 @@ public class ProgressController {
     public ResponseEntity<List<QuestionResponse>> getUnfinishedQuestions(@AuthenticationPrincipal User user, @PathVariable Integer limit){
         return ResponseEntity.ok(this.progressService.findUnfinishedQuestions(user, limit));
     }
+
+    @GetMapping("/sequence")
+    public ResponseEntity<Integer> getSequence(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(this.progressService.calcSequence(user.getId()));
+    }
 }
