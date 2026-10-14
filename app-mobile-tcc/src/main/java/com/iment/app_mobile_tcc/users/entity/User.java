@@ -28,6 +28,8 @@ public class User implements UserDetails {
     private String email;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = true)
+    private String pin;
 //    @Column(nullable = false)
 //    private UserEnum role; to-do
 

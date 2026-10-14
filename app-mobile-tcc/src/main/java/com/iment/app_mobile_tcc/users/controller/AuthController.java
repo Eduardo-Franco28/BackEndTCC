@@ -1,10 +1,7 @@
 package com.iment.app_mobile_tcc.users.controller;
 
 import com.iment.app_mobile_tcc.shared.security.TokenService;
-import com.iment.app_mobile_tcc.users.dto.request.NewPasswordRequest;
-import com.iment.app_mobile_tcc.users.dto.request.NewProfileRequest;
-import com.iment.app_mobile_tcc.users.dto.request.LoginRequest;
-import com.iment.app_mobile_tcc.users.dto.request.RegisterRequest;
+import com.iment.app_mobile_tcc.users.dto.request.*;
 import com.iment.app_mobile_tcc.users.dto.response.AuthResponse;
 import com.iment.app_mobile_tcc.users.dto.response.UserResponse;
 import com.iment.app_mobile_tcc.users.entity.User;
@@ -60,12 +57,21 @@ public class AuthController {
         newUser.setPassword(this.passwordEncoder.encode(request.password()));
         newUser.setNome(request.name());
         newUser.setEmail(request.email());
+        newUser.setPin(this.passwordEncoder.encode(request.pin()));
 
-        this.userRepository.save(newUser);
+            this.userRepository.save(newUser);
+    
+            String token = this.tokenService.generateToken(newUser);
+    
+            return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, UserResponse.from(newUser)));
+        }
 
-        String token = this.tokenService.generateToken(newUser);
+    @PostMapping("/pin")
+    public ResponseEntity<Boolean> verifyPin(@RequestBody PinRequest request, @AuthenticationPrincipal User user){
+        if(user.getPin() == null)
+            return ResponseEntity.ok(false);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, UserResponse.from(newUser)));
+        return ResponseEntity.ok(this.passwordEncoder.matches(request.pin(), user.getPin()));
     }
 
     @PatchMapping("/profile")

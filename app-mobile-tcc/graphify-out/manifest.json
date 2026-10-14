@@ -1,0 +1,386 @@
+{
+  "src/main/java/com/iment/app_mobile_tcc/AppMobileTccApplication.java": {
+    "mtime": 1773104151.5210488,
+    "seen": 1791484144.1077852,
+    "ast_hash": "25e21239a96d9f833a69709ffff9be25",
+    "semantic_hash": "25e21239a96d9f833a69709ffff9be25"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/controller/AlternativeController.java": {
+    "mtime": 1791384714.7423522,
+    "seen": 1791484144.1077852,
+    "ast_hash": "6a33c368bae994ae6a3a6f89151c65cb",
+    "semantic_hash": "6a33c368bae994ae6a3a6f89151c65cb"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/dto/request/AlternativeRequest.java": {
+    "mtime": 1791384714.7438588,
+    "seen": 1791484144.1077852,
+    "ast_hash": "80bd1580126b23abba30ecef1e82b6e4",
+    "semantic_hash": "80bd1580126b23abba30ecef1e82b6e4"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/dto/response/AlternativeResponse.java": {
+    "mtime": 1791384714.7456465,
+    "seen": 1791484144.1077852,
+    "ast_hash": "8ccd59970947d9e84aaa2565e7c01ed3",
+    "semantic_hash": "8ccd59970947d9e84aaa2565e7c01ed3"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/entity/Alternative.java": {
+    "mtime": 1791384714.7489004,
+    "seen": 1791484144.1077852,
+    "ast_hash": "c29b0c50478a7028fb77d2caa194b09b",
+    "semantic_hash": "c29b0c50478a7028fb77d2caa194b09b"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/repository/AlternativeRepository.java": {
+    "mtime": 1791384714.749906,
+    "seen": 1791484144.1077852,
+    "ast_hash": "cdece4fc5da895490196493831d34ab1",
+    "semantic_hash": "cdece4fc5da895490196493831d34ab1"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/alternatives/service/AlternativeService.java": {
+    "mtime": 1791384714.7519052,
+    "seen": 1791484144.1077852,
+    "ast_hash": "dcee37c2d04de8bf2090e50a7bb0f61e",
+    "semantic_hash": "dcee37c2d04de8bf2090e50a7bb0f61e"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/controller/BoardController.java": {
+    "mtime": 1791384714.7529051,
+    "seen": 1791484144.1077852,
+    "ast_hash": "d83237422d74a7272e9c095d7adc4aff",
+    "semantic_hash": "d83237422d74a7272e9c095d7adc4aff"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/dto/content/BoardSlot.java": {
+    "mtime": 1791384714.753905,
+    "seen": 1791484144.1077852,
+    "ast_hash": "1c17d8d9eb651b2ed23909408b18ef9a",
+    "semantic_hash": "1c17d8d9eb651b2ed23909408b18ef9a"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/dto/request/BoardRequest.java": {
+    "mtime": 1791384714.754905,
+    "seen": 1791484144.1077852,
+    "ast_hash": "21d0768ec6ce7112bd8cbadf7e9759d4",
+    "semantic_hash": "21d0768ec6ce7112bd8cbadf7e9759d4"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/dto/response/BoardResponse.java": {
+    "mtime": 1791384714.7559054,
+    "seen": 1791484144.1077852,
+    "ast_hash": "f98c7d4674b9053579a18047e2de460d",
+    "semantic_hash": "f98c7d4674b9053579a18047e2de460d"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/entity/Board.java": {
+    "mtime": 1791384714.7569053,
+    "seen": 1791484144.1077852,
+    "ast_hash": "5c86865ad0a2c86b80162b734387a7a7",
+    "semantic_hash": "5c86865ad0a2c86b80162b734387a7a7"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/repository/BoardRepository.java": {
+    "mtime": 1791384714.7579055,
+    "seen": 1791484144.1077852,
+    "ast_hash": "f81ef461ccea972e20052153d924195c",
+    "semantic_hash": "f81ef461ccea972e20052153d924195c"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/boards/service/BoardService.java": {
+    "mtime": 1791384714.7590437,
+    "seen": 1791484144.1077852,
+    "ast_hash": "ed6601a029ed1409df8f267fdc685ec4",
+    "semantic_hash": "ed6601a029ed1409df8f267fdc685ec4"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/controller/AttemptAlternativeController.java": {
+    "mtime": 1791384714.76005,
+    "seen": 1791484144.1077852,
+    "ast_hash": "7501f4f723b8c482dd83c8dbfecb76a0",
+    "semantic_hash": "7501f4f723b8c482dd83c8dbfecb76a0"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/controller/ProgressController.java": {
+    "mtime": 1791384714.7610495,
+    "seen": 1791484144.1077852,
+    "ast_hash": "7deba9a68ee6f8bb73cbc8c1f0729059",
+    "semantic_hash": "7deba9a68ee6f8bb73cbc8c1f0729059"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/dto/correction/CorrectionResult.java": {
+    "mtime": 1791384714.7620494,
+    "seen": 1791484144.1077852,
+    "ast_hash": "42b7a17df0a77f7c3d04c71ba4fcd030",
+    "semantic_hash": "42b7a17df0a77f7c3d04c71ba4fcd030"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/dto/request/AttemptAlternativeRequest.java": {
+    "mtime": 1791384714.7630494,
+    "seen": 1791484144.1077852,
+    "ast_hash": "13f774a664b2dfa7ef90d952b89886b4",
+    "semantic_hash": "13f774a664b2dfa7ef90d952b89886b4"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/dto/response/AnsweredAlternativeResponse.java": {
+    "mtime": 1791384714.76405,
+    "seen": 1791484144.1077852,
+    "ast_hash": "28d43df00eaea33e2108770a7c4a4766",
+    "semantic_hash": "28d43df00eaea33e2108770a7c4a4766"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/entity/QuestionAttempt.java": {
+    "mtime": 1791384714.7650497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "ac6be187ff723e2ad879fc279d2771d3",
+    "semantic_hash": "ac6be187ff723e2ad879fc279d2771d3"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/repository/QuestionAttemptRepository.java": {
+    "mtime": 1791384714.7660496,
+    "seen": 1791484144.1077852,
+    "ast_hash": "2bf464cc29d70c8e93c993ff1ee59c03",
+    "semantic_hash": "2bf464cc29d70c8e93c993ff1ee59c03"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/service/AttemptService.java": {
+    "mtime": 1791384714.7670498,
+    "seen": 1791484144.1077852,
+    "ast_hash": "25aedd588d67ac67fabc9dab0e4096e3",
+    "semantic_hash": "25aedd588d67ac67fabc9dab0e4096e3"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/service/CorrectionService.java": {
+    "mtime": 1791384714.7680497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "b03639c0dbe03608d56a98012d855603",
+    "semantic_hash": "b03639c0dbe03608d56a98012d855603"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/progress/service/ProgressService.java": {
+    "mtime": 1791384714.7680497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "15354b714364bd0522670f1fb5007182",
+    "semantic_hash": "15354b714364bd0522670f1fb5007182"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/controller/QuestionController.java": {
+    "mtime": 1791384714.7700498,
+    "seen": 1791484144.1077852,
+    "ast_hash": "77b84c8c48f486801e4236c16a2830f5",
+    "semantic_hash": "77b84c8c48f486801e4236c16a2830f5"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/dto/content/QuestionSlot.java": {
+    "mtime": 1791384714.77105,
+    "seen": 1791484144.1077852,
+    "ast_hash": "065aaf157472db4d0629f8b4b26505eb",
+    "semantic_hash": "065aaf157472db4d0629f8b4b26505eb"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/dto/content/QuestionSlotContent.java": {
+    "mtime": 1791384714.77105,
+    "seen": 1791484144.1077852,
+    "ast_hash": "8af1cbd54ca2bf0e88a51ec5e2150035",
+    "semantic_hash": "8af1cbd54ca2bf0e88a51ec5e2150035"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/dto/request/FilledSlot.java": {
+    "mtime": 1791384714.7720506,
+    "seen": 1791484144.1077852,
+    "ast_hash": "02f0ab466a23eecf551ce7672576a71a",
+    "semantic_hash": "02f0ab466a23eecf551ce7672576a71a"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/dto/request/QuestionRequest.java": {
+    "mtime": 1791384714.773049,
+    "seen": 1791484144.1077852,
+    "ast_hash": "981c34eeb2cfd48a35716d55d0f5098c",
+    "semantic_hash": "981c34eeb2cfd48a35716d55d0f5098c"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/dto/response/QuestionResponse.java": {
+    "mtime": 1791384714.7740498,
+    "seen": 1791484144.1077852,
+    "ast_hash": "856cb7d6a727ca1ff5c983bbd668027d",
+    "semantic_hash": "856cb7d6a727ca1ff5c983bbd668027d"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/entity/Question.java": {
+    "mtime": 1791384714.7750502,
+    "seen": 1791484144.1077852,
+    "ast_hash": "99db62ef659afd6100987535cdce24c2",
+    "semantic_hash": "99db62ef659afd6100987535cdce24c2"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/enums/QuestionTypeEnum.java": {
+    "mtime": 1791384714.7760496,
+    "seen": 1791484144.1077852,
+    "ast_hash": "98a94667aebe7f51200291df52ee3ffa",
+    "semantic_hash": "98a94667aebe7f51200291df52ee3ffa"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/repository/QuestionRepository.java": {
+    "mtime": 1791384714.7770493,
+    "seen": 1791484144.1077852,
+    "ast_hash": "4c39dd05c74a8737d9d3d45ffbcbde00",
+    "semantic_hash": "4c39dd05c74a8737d9d3d45ffbcbde00"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/questions/service/QuestionService.java": {
+    "mtime": 1791384714.7780495,
+    "seen": 1791484144.1077852,
+    "ast_hash": "81f0c8913031a970cd0e1b8cd6a94e7b",
+    "semantic_hash": "81f0c8913031a970cd0e1b8cd6a94e7b"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/shared/config/SecurityConfig.java": {
+    "mtime": 1791384714.7790494,
+    "seen": 1791484144.1077852,
+    "ast_hash": "db4726048bebbcbcf869c1c0fa9ed17a",
+    "semantic_hash": "db4726048bebbcbcf869c1c0fa9ed17a"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/shared/security/AuthService.java": {
+    "mtime": 1791384714.7800496,
+    "seen": 1791484144.1077852,
+    "ast_hash": "1f49b24823720c74ebc6f7c99638ac70",
+    "semantic_hash": "1f49b24823720c74ebc6f7c99638ac70"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/shared/security/SecurityFilter.java": {
+    "mtime": 1791384714.7810497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "37c5871834a6a735a6525f979074d9c5",
+    "semantic_hash": "37c5871834a6a735a6525f979074d9c5"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/shared/security/TokenService.java": {
+    "mtime": 1791407301.7451591,
+    "seen": 1791484144.1077852,
+    "ast_hash": "3d2baf0b837e9c1a18126d4fcfc26938",
+    "semantic_hash": "3d2baf0b837e9c1a18126d4fcfc26938"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/controller/SubjectController.java": {
+    "mtime": 1791384714.7830493,
+    "seen": 1791484144.1077852,
+    "ast_hash": "04edb8ca953e8f351d58f4ac80f4dae3",
+    "semantic_hash": "04edb8ca953e8f351d58f4ac80f4dae3"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/dto/request/SubjectRequest.java": {
+    "mtime": 1783985581.3250828,
+    "seen": 1791484144.1077852,
+    "ast_hash": "c6355ba5aa3ccfa88a3e4ba918af6688",
+    "semantic_hash": "c6355ba5aa3ccfa88a3e4ba918af6688"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/dto/response/SubjectResponse.java": {
+    "mtime": 1783985581.3799794,
+    "seen": 1791484144.1077852,
+    "ast_hash": "e1e83c9cd9d34fce1da85251a8d65e5c",
+    "semantic_hash": "e1e83c9cd9d34fce1da85251a8d65e5c"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/entity/Subject.java": {
+    "mtime": 1783345461.7770216,
+    "seen": 1791484144.1077852,
+    "ast_hash": "d98e3db519967b0e0a48e2ac0e7a7f0b",
+    "semantic_hash": "d98e3db519967b0e0a48e2ac0e7a7f0b"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/repository/SubjectRepository.java": {
+    "mtime": 1778957551.971764,
+    "seen": 1791484144.1077852,
+    "ast_hash": "6c2e5c2ffcff3cd93f0e69cd49a6f44a",
+    "semantic_hash": "6c2e5c2ffcff3cd93f0e69cd49a6f44a"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/subjects/service/SubjectService.java": {
+    "mtime": 1783985581.158683,
+    "seen": 1791484144.1077852,
+    "ast_hash": "0389e2d516670c180c296bcbe3f28f04",
+    "semantic_hash": "0389e2d516670c180c296bcbe3f28f04"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/controller/TopicController.java": {
+    "mtime": 1791384714.7840495,
+    "seen": 1791484144.1077852,
+    "ast_hash": "b820e83f264c19f18503581f22e9606c",
+    "semantic_hash": "b820e83f264c19f18503581f22e9606c"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/dto/request/TopicRequest.java": {
+    "mtime": 1783472013.19954,
+    "seen": 1791484144.1077852,
+    "ast_hash": "91f0170d1d6e9fbe29a5c861fd281e41",
+    "semantic_hash": "91f0170d1d6e9fbe29a5c861fd281e41"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/dto/response/ActivityResponse.java": {
+    "mtime": 1791384714.7850497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "e2d5801dc51d380eea5647c0b07d1874",
+    "semantic_hash": "e2d5801dc51d380eea5647c0b07d1874"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/dto/response/TopicResponse.java": {
+    "mtime": 1791384714.7860494,
+    "seen": 1791484144.1077852,
+    "ast_hash": "2b7cac574c0259ac4b7c8b0fc86a9f38",
+    "semantic_hash": "2b7cac574c0259ac4b7c8b0fc86a9f38"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/entity/Topic.java": {
+    "mtime": 1784991901.8831818,
+    "seen": 1791484144.1077852,
+    "ast_hash": "c62c97072333679238a11b03b6fdc254",
+    "semantic_hash": "c62c97072333679238a11b03b6fdc254"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/enums/TopicStatusEnum.java": {
+    "mtime": 1791384714.7870498,
+    "seen": 1791484144.1077852,
+    "ast_hash": "3b7d2af67e407ddd8dc9877b42092162",
+    "semantic_hash": "3b7d2af67e407ddd8dc9877b42092162"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/repository/TopicRepository.java": {
+    "mtime": 1786498240.9029803,
+    "seen": 1791484144.1077852,
+    "ast_hash": "4ecd2cbedc7a5a58351ed6f0fb75b025",
+    "semantic_hash": "4ecd2cbedc7a5a58351ed6f0fb75b025"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/topics/service/TopicService.java": {
+    "mtime": 1791384714.7880495,
+    "seen": 1791484144.1077852,
+    "ast_hash": "d31905bec501054ab171519b34728c86",
+    "semantic_hash": "d31905bec501054ab171519b34728c86"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/controller/AuthController.java": {
+    "mtime": 1791481436.1475267,
+    "seen": 1791484144.1077852,
+    "ast_hash": "0ad5c78aaf1e2368aa5789220f719d34",
+    "semantic_hash": "0ad5c78aaf1e2368aa5789220f719d34"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/request/LoginRequest.java": {
+    "mtime": 1774400617.4377017,
+    "seen": 1791484144.1077852,
+    "ast_hash": "2d02d5c58a24b1ad4760246bc8afbfe8",
+    "semantic_hash": "2d02d5c58a24b1ad4760246bc8afbfe8"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/request/NewPasswordRequest.java": {
+    "mtime": 1791384714.7900505,
+    "seen": 1791484144.1077852,
+    "ast_hash": "d1dd36834f0d2a2dfe58ede735628460",
+    "semantic_hash": "d1dd36834f0d2a2dfe58ede735628460"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/request/NewProfileRequest.java": {
+    "mtime": 1791384714.7910497,
+    "seen": 1791484144.1077852,
+    "ast_hash": "d9219727f7ac7beed83950c58ce1fa40",
+    "semantic_hash": "d9219727f7ac7beed83950c58ce1fa40"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/request/RegisterRequest.java": {
+    "mtime": 1791481659.275612,
+    "seen": 1791484144.1077852,
+    "ast_hash": "06328746683404c5a95cfb5eaa2516ee",
+    "semantic_hash": "06328746683404c5a95cfb5eaa2516ee"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/response/AuthResponse.java": {
+    "mtime": 1782826487.193315,
+    "seen": 1791484144.1077852,
+    "ast_hash": "aae47b2574776e669ed65fe373da31db",
+    "semantic_hash": "aae47b2574776e669ed65fe373da31db"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/dto/response/UserResponse.java": {
+    "mtime": 1791481659.206598,
+    "seen": 1791484144.1077852,
+    "ast_hash": "a155756255fe1e82daa96c681eff0fc6",
+    "semantic_hash": "a155756255fe1e82daa96c681eff0fc6"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/entity/User.java": {
+    "mtime": 1791481659.29261,
+    "seen": 1791484144.1077852,
+    "ast_hash": "b022ce1d77f0c978b6f898bd6be4a650",
+    "semantic_hash": "b022ce1d77f0c978b6f898bd6be4a650"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/enums/UserEnum.java": {
+    "mtime": 1777417315.045709,
+    "seen": 1791484144.1077852,
+    "ast_hash": "c239ce3a6749e3fdd346d4b16b3ee686",
+    "semantic_hash": "c239ce3a6749e3fdd346d4b16b3ee686"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/enums/UserGrade.java": {
+    "mtime": 1778115944.5036922,
+    "seen": 1791484144.1077852,
+    "ast_hash": "bb1bcf999afaa7c23f5316d521e131dc",
+    "semantic_hash": "bb1bcf999afaa7c23f5316d521e131dc"
+  },
+  "src/main/java/com/iment/app_mobile_tcc/users/repository/UserRepository.java": {
+    "mtime": 1775321621.5504453,
+    "seen": 1791484144.1077852,
+    "ast_hash": "7562e7fe6b7074319ea913834972468e",
+    "semantic_hash": "7562e7fe6b7074319ea913834972468e"
+  },
+  "src/test/java/com/iment/app_mobile_tcc/AppMobileTccApplicationTests.java": {
+    "mtime": 1773104151.6894927,
+    "seen": 1791484144.1077852,
+    "ast_hash": "5086a91d6054c423acf22f7c0f656526",
+    "semantic_hash": "5086a91d6054c423acf22f7c0f656526"
+  }
+}

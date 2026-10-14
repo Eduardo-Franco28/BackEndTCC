@@ -24,7 +24,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                    .withIssuer("auth-eduka")
+                    .withIssuer("auth-integramente")
                     .withSubject(user.getEmail())
                     .withExpiresAt(this.getExpirationToken())
                     .sign(algorithm);
@@ -37,7 +37,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("auth-eduka")
+                    .withIssuer("auth-integramente")
                     .build()
                     .verify(token)
                     .getSubject();

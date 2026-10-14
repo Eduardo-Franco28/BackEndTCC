@@ -1,9 +1,9 @@
 ---
 name: backend
-description: Padrões e convenções do backend do Eduka (Spring Boot 4 + Java 21 + PostgreSQL) — como criar entidades, endpoints, consultas, DTOs e regras de progresso seguindo a arquitetura que já existe. Use ao adicionar ou alterar qualquer coisa em src/main/java, ao criar rota nova, ao mexer em progresso/tentativas do aluno, ou quando a aplicação não compilar/subir.
+description: Padrões e convenções do backend do IntegraMente (Spring Boot 4 + Java 21 + PostgreSQL) — como criar entidades, endpoints, consultas, DTOs e regras de progresso seguindo a arquitetura que já existe. Use ao adicionar ou alterar qualquer coisa em src/main/java, ao criar rota nova, ao mexer em progresso/tentativas do aluno, ou quando a aplicação não compilar/subir.
 ---
 
-# Backend do Eduka
+# Backend do IntegraMente
 
 API REST de um app educacional (TCC). O app React Native é outro projeto e
 consome esta API. Conteúdo organizado em quatro níveis:
