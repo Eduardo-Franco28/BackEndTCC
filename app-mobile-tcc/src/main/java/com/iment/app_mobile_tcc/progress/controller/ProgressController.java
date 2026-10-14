@@ -1,5 +1,6 @@
 package com.iment.app_mobile_tcc.progress.controller;
 
+import com.iment.app_mobile_tcc.progress.dto.response.StatsResponse;
 import com.iment.app_mobile_tcc.progress.service.ProgressService;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.topics.service.TopicService;
@@ -37,6 +38,15 @@ public class ProgressController {
     @GetMapping("/{limit}/unfinished")
     public ResponseEntity<List<QuestionResponse>> getUnfinishedQuestions(@AuthenticationPrincipal User user, @PathVariable Integer limit){
         return ResponseEntity.ok(this.progressService.findUnfinishedQuestions(user, limit));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<StatsResponse> getSummary(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(new StatsResponse(
+                this.progressService.getAllConcludedQuestionIds(user.getId()).size(),
+                this.topicService.getConcluded(user).size(),
+                this.progressService.calcSequence(user.getId())
+        ));
     }
 
     @GetMapping("/sequence")
