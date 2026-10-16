@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class User implements UserDetails {
     private String password;
     @Column(nullable = true)
     private String pin;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int pinFailedAttempts;
+
+    private Instant pinLockedUntil;
 //    @Column(nullable = false)
 //    private UserEnum role; to-do
 

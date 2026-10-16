@@ -7,6 +7,7 @@ import com.iment.app_mobile_tcc.users.dto.response.UserResponse;
 import com.iment.app_mobile_tcc.users.entity.User;
 import com.iment.app_mobile_tcc.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,9 +18,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Duration PIN_LOCK_TIME = Duration.ofMinutes(2);
 
     @Autowired
     private UserRepository userRepository;
@@ -71,7 +77,39 @@ public class AuthController {
         if(user.getPin() == null)
             return ResponseEntity.ok(false);
 
-        return ResponseEntity.ok(this.passwordEncoder.matches(request.pin(), user.getPin()));
+        if(user.getPinLockedUntil() != null && Instant.now().isBefore(user.getPinLockedUntil())){
+            long secondsLeft = Duration.between(Instant.now(), user.getPinLockedUntil()).toSeconds() + 1;
+
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header(HttpHeaders.RETRY_AFTER, String.valueOf(secondsLeft))
+                    .build();
+        }
+
+        if(this.passwordEncoder.matches(request.pin(), user.getPin())){
+            if(user.getPinFailedAttempts() > 0){
+                user.setPinFailedAttempts(0);
+                this.userRepository.save(user);
+            }
+
+            return ResponseEntity.ok(true);
+        }
+
+        int attempts = user.getPinFailedAttempts() + 1;
+
+        if(attempts >= 5){
+            user.setPinFailedAttempts(0);
+            user.setPinLockedUntil(Instant.now().plus(PIN_LOCK_TIME));
+            this.userRepository.save(user);
+
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header(HttpHeaders.RETRY_AFTER, String.valueOf(PIN_LOCK_TIME.toSeconds()))
+                    .build();
+        }
+
+        user.setPinFailedAttempts(attempts);
+        this.userRepository.save(user);
+
+        return ResponseEntity.ok(false);
     }
 
     @PatchMapping("/profile")

@@ -49,7 +49,12 @@ public class TopicService {
                     null,
                     obj.title(),
                     obj.subTitle(),
-                    subject
+                    subject,
+                    null,
+                    false,
+                    false,
+                    null,
+                    null
             );
 
             return TopicResponse.from(this.topicRepository.save(topic));
@@ -108,7 +113,7 @@ public class TopicService {
     }
 
     public List<TopicResponse> getBySubject(User user, Long subjectId){
-        List<Topic> topics = this.topicRepository.findAllBySubjectId(subjectId);
+        List<Topic> topics = this.topicRepository.findPlayableBySubject(subjectId, user.getId());
 
         if(topics.isEmpty())
             throw new RuntimeException("Nenhum tópico encontrado");
