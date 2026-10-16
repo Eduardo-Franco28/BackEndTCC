@@ -19,4 +19,15 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
         AND t.removedAt IS NULL
         """)
     List<Topic> findPlayableBySubject(@Param("subjectId") Long subjectId, @Param("userId") Long userId);
+
+    @Query("""
+        SELECT t FROM Topic t
+        WHERE (t.owner IS NULL OR t.owner.id = :userId)
+        AND t.draft = false
+        AND t.catalog = false
+        AND t.removedAt IS NULL
+        """)
+    List<Topic> findAllPlayable(@Param("userId") Long userId);
+
+    List<Topic> findAllByOwnerIdAndCatalogFalseAndRemovedAtIsNull(Long ownerId);
 }

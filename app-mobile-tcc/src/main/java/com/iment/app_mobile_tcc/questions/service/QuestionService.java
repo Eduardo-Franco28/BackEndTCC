@@ -6,6 +6,8 @@ import com.iment.app_mobile_tcc.questions.dto.request.QuestionRequest;
 import com.iment.app_mobile_tcc.questions.dto.response.QuestionResponse;
 import com.iment.app_mobile_tcc.boards.entity.Board;
 import com.iment.app_mobile_tcc.questions.entity.Question;
+import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
+import com.iment.app_mobile_tcc.questions.validator.LettersValidator;
 import com.iment.app_mobile_tcc.boards.repository.BoardRepository;
 import com.iment.app_mobile_tcc.questions.repository.QuestionRepository;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
@@ -30,6 +32,9 @@ public class QuestionService {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private LettersValidator lettersValidator;
+
     public QuestionResponse create(QuestionRequest obj) {
         if(obj.title() == null || obj.title().isBlank())
             throw new RuntimeException("O nome do tópico não pode vir vazio");
@@ -38,6 +43,18 @@ public class QuestionService {
             throw new RuntimeException("A atividade precisa de conteúdo");
 
         Topic topic = this.topicRepository.findById(obj.topicId()).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+
+        return QuestionResponse.from(this.createQuestion(topic, obj), false, null);
+    }
+
+    public Question createQuestion(Topic topic, QuestionRequest obj) {
+        if(obj.title() == null || obj.title().isBlank())
+            throw new RuntimeException("O nome da questão não pode vir vazio");
+
+        if(obj.content() == null)
+            throw new RuntimeException("A atividade precisa de conteúdo");
+
+        this.validateContent(obj.type(), obj.content().toString());
 
         Board board = null;
 
@@ -57,7 +74,7 @@ public class QuestionService {
                     board
             );
 
-            return QuestionResponse.from(this.questionRepository.save(question), false, null);
+            return this.questionRepository.save(question);
         } catch (Exception e){
             throw new RuntimeException("Falha na criação da questão", e);
         }
@@ -69,6 +86,8 @@ public class QuestionService {
 
         if(obj.content() == null)
             throw new RuntimeException("A atividade precisa de conteúdo");
+
+        this.validateContent(obj.type(), obj.content().toString());
 
         Question question = this.getQuestion(id);
 
@@ -133,5 +152,10 @@ public class QuestionService {
     public Question getQuestion(Long id){
         return this.questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Questão não encontrada"));
+    }
+
+    private void validateContent(QuestionTypeEnum type, String content){
+        if(type == QuestionTypeEnum.DRAG_LETTERS)
+            this.lettersValidator.validate(content);
     }
 }

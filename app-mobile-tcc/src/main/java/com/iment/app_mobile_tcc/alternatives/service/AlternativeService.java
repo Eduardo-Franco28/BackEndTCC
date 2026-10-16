@@ -29,6 +29,13 @@ public class AlternativeService {
 
         Question question = this.questionRepository.findById(obj.questionId()).orElseThrow(() -> new RuntimeException("Questão não encontrada"));
 
+        return AlternativeResponse.from(this.createAlternative(question, obj));
+    }
+
+    public Alternative createAlternative(Question question, AlternativeRequest obj) {
+        if(obj.description() == null || obj.description().isBlank())
+            throw new RuntimeException("A alternativa precisa de um valor");
+
         try {
             Alternative alternative = new Alternative(
                     null,
@@ -39,7 +46,7 @@ public class AlternativeService {
                     obj.icon()
             );
 
-            return AlternativeResponse.from(this.alternativeRepository.save(alternative));
+            return this.alternativeRepository.save(alternative);
         } catch (Exception e){
             throw new RuntimeException("Falha na criação da alternativa", e);
         }
