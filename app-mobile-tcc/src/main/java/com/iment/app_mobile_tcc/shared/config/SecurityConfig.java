@@ -1,6 +1,7 @@
 package com.iment.app_mobile_tcc.shared.config;
 
 import com.iment.app_mobile_tcc.shared.security.SecurityFilter;
+import com.iment.app_mobile_tcc.shared.security.TokenService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,8 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/teo/exchange").permitAll()
+                        .requestMatchers("/auth/teo/refresh", "/mcp/**", "/drafts/**", "/catalog/**").hasAuthority("SCOPE_" + TokenService.TEO_SCOPE)
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
