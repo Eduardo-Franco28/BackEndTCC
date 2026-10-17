@@ -80,6 +80,25 @@ public class QuestionService {
         }
     }
 
+    public Question copyQuestion(Question source, Topic target) {
+        try {
+            Question question = new Question(
+                    null,
+                    source.getTitle(),
+                    target,
+                    source.getLevel(),
+                    source.getType(),
+                    source.getContent(),
+                    List.of(),
+                    source.getBoard()
+            );
+
+            return this.questionRepository.save(question);
+        } catch (Exception e){
+            throw new RuntimeException("Falha ao copiar a questão", e);
+        }
+    }
+
     public QuestionResponse update(Long id, QuestionRequest obj) {
         if(obj.title() == null || obj.title().isBlank())
             throw new RuntimeException("O nome da questão não pode vir vazio");

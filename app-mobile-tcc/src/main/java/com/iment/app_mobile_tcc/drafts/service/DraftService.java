@@ -2,6 +2,8 @@ package com.iment.app_mobile_tcc.drafts.service;
 
 import com.iment.app_mobile_tcc.alternatives.dto.request.AlternativeRequest;
 import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
+import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
+import com.iment.app_mobile_tcc.catalog.service.CatalogService;
 import com.iment.app_mobile_tcc.drafts.builder.LettersBuilder;
 import com.iment.app_mobile_tcc.drafts.dto.request.LettersDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.request.WordRequest;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DraftService {
@@ -38,6 +41,9 @@ public class DraftService {
     @Autowired
     private LettersBuilder lettersBuilder;
 
+    @Autowired
+    private CatalogService catalogService;
+
     @Transactional
     public DraftResponse createLetters(LettersDraftRequest obj, User user){
         if(obj.words() == null || obj.words().isEmpty())
@@ -57,12 +63,14 @@ public class DraftService {
                 this.alternativeService.createAlternative(question, piece);
         }
 
-        return DraftResponse.from(topic);
+        return DraftResponse.from(topic, false);
     }
 
     public List<DraftResponse> getAll(User user){
+        Set<Long> publishedIds = this.catalogService.getPublishedIds(user);
+
         return this.topicService.getOwnedTopics(user).stream()
-                .map(DraftResponse::from)
+                .map(topic -> DraftResponse.from(topic, publishedIds.contains(topic.getId())))
                 .toList();
     }
 
@@ -71,10 +79,20 @@ public class DraftService {
     }
 
     public DraftResponse approve(Long id, User user){
-        return DraftResponse.from(this.topicService.approveDraft(id, user));
+        return DraftResponse.from(this.topicService.approveDraft(id, user), false);
     }
 
+    @Transactional
     public void remove(Long id, User user){
         this.topicService.removeFromAccount(id, user);
+        this.catalogService.unpublishIfPublished(id, user);
+    }
+
+    public CatalogResponse publish(Long id, User user){
+        return this.catalogService.publish(id, user);
+    }
+
+    public void unpublish(Long id, User user){
+        this.catalogService.unpublish(id, user);
     }
 }

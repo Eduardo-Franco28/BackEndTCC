@@ -1,5 +1,7 @@
 package com.iment.app_mobile_tcc.mcp.tools;
 
+import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
+import com.iment.app_mobile_tcc.catalog.service.CatalogService;
 import com.iment.app_mobile_tcc.drafts.dto.request.LettersDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.request.WordRequest;
 import com.iment.app_mobile_tcc.drafts.dto.response.DraftResponse;
@@ -24,9 +26,21 @@ public class TeoTools {
     @Autowired
     private DraftService draftService;
 
+    @Autowired
+    private CatalogService catalogService;
+
     @McpTool(name = "list_subjects", description = "Lista as matérias do IntegraMente. Use o id da matéria ao criar uma atividade.")
     public List<SubjectResponse> listSubjects(){
         return this.subjectService.getAll();
+    }
+
+    @McpTool(name = "search_catalog", description = """
+            Busca atividades prontas que outros adultos publicaram no catálogo do IntegraMente.
+            Use para sugerir atividades parecidas com o que o adulto pediu. Quem adiciona à conta é o adulto, pela aba Catálogo.
+            """)
+    public List<CatalogResponse> searchCatalog(
+            @McpToolParam(description = "Palavra para buscar no título ou na matéria, por exemplo: frutas", required = false) String query){
+        return this.catalogService.getAll(this.getUser(), null, query);
     }
 
     @McpTool(name = "list_my_drafts", description = "Lista as atividades criadas nesta conta, aprovadas ou ainda em rascunho.")

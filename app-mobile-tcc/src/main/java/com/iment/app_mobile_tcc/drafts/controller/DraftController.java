@@ -1,5 +1,6 @@
 package com.iment.app_mobile_tcc.drafts.controller;
 
+import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
 import com.iment.app_mobile_tcc.drafts.dto.request.LettersDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.response.DraftResponse;
 import com.iment.app_mobile_tcc.drafts.service.DraftService;
@@ -44,6 +45,20 @@ public class DraftController {
     @PostMapping("/{id}/remove")
     public ResponseEntity<Void> remove(@PathVariable Long id, @AuthenticationPrincipal User user){
         this.draftService.remove(id, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<CatalogResponse> publish(@PathVariable Long id, @AuthenticationPrincipal User user){
+        CatalogResponse published = this.draftService.publish(id, user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(published);
+    }
+
+    @PostMapping("/{id}/unpublish")
+    public ResponseEntity<Void> unpublish(@PathVariable Long id, @AuthenticationPrincipal User user){
+        this.draftService.unpublish(id, user);
 
         return ResponseEntity.noContent().build();
     }

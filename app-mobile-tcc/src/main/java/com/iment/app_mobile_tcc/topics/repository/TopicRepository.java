@@ -30,4 +30,27 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findAllPlayable(@Param("userId") Long userId);
 
     List<Topic> findAllByOwnerIdAndCatalogFalseAndRemovedAtIsNull(Long ownerId);
+
+    @Query("""
+        SELECT t FROM Topic t
+        JOIN FETCH t.owner
+        JOIN FETCH t.subject
+        WHERE t.catalog = true
+        AND t.removedAt IS NULL
+        ORDER BY t.id DESC
+        """)
+    List<Topic> findAllInCatalog();
+
+    List<Topic> findAllByOwnerIdAndRemovedAtIsNullAndForkedFromIsNotNull(Long ownerId);
+
+    Optional<Topic> findFirstByOwnerIdAndForkedFromIdAndCatalogTrueAndRemovedAtIsNull(Long ownerId, Long forkedFromId);
+
+    @Query("""
+        SELECT t.forkedFrom.id, COUNT(t) FROM Topic t
+        WHERE t.forkedFrom.id IN :ids
+        AND t.catalog = false
+        AND t.removedAt IS NULL
+        GROUP BY t.forkedFrom.id
+        """)
+    List<Object[]> countCopies(@Param("ids") List<Long> ids);
 }

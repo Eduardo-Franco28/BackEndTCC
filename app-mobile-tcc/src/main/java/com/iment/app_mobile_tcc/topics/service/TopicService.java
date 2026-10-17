@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Set;
 
@@ -110,6 +112,80 @@ public class TopicService {
             return this.topicRepository.save(topic);
         } catch (Exception e){
             throw new RuntimeException("Falha na criação do rascunho", e);
+        }
+    }
+
+    public Topic createCopy(Topic source, User owner, boolean catalog) {
+        try {
+            Topic topic = new Topic(
+                    null,
+                    source.getTitle(),
+                    source.getSubTitle(),
+                    source.getSubject(),
+                    owner,
+                    false,
+                    catalog,
+                    source,
+                    null
+            );
+
+            return this.topicRepository.save(topic);
+        } catch (Exception e){
+            throw new RuntimeException("Falha ao copiar a atividade", e);
+        }
+    }
+
+    public List<Topic> getCatalog(){
+        try {
+            return this.topicRepository.findAllInCatalog();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao buscar o catálogo", e);
+        }
+    }
+
+    public Topic getCatalogTopic(Long id){
+        Topic topic = this.topicRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Atividade não encontrada no catálogo"));
+
+        if(!topic.isCatalog() || topic.getRemovedAt() != null)
+            throw new EntityNotFoundException("Atividade não encontrada no catálogo");
+
+        return topic;
+    }
+
+    public ActivityResponse getCatalogActivity(Long id, Long userId){
+        this.getCatalogTopic(id);
+
+        return this.buildActivity(id, userId);
+    }
+
+    public List<Topic> getActiveCopies(User owner){
+        try {
+            return this.topicRepository.findAllByOwnerIdAndRemovedAtIsNullAndForkedFromIsNotNull(owner.getId());
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao buscar as cópias da conta", e);
+        }
+    }
+
+    public Map<Long, Long> countCopies(List<Long> ids){
+        if(ids.isEmpty())
+            return Map.of();
+
+        return this.topicRepository.countCopies(ids).stream()
+                .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
+    }
+
+    public void removeFromCatalog(Long sourceId, User owner){
+        Topic topic = this.topicRepository
+                .findFirstByOwnerIdAndForkedFromIdAndCatalogTrueAndRemovedAtIsNull(owner.getId(), sourceId)
+                .orElseThrow(() -> new EntityNotFoundException("Essa atividade não está no catálogo"));
+
+        try {
+            topic.setRemovedAt(Instant.now());
+
+            this.topicRepository.save(topic);
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao tirar a atividade do catálogo", e);
         }
     }
 
