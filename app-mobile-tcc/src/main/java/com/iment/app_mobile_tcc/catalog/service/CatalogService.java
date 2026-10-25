@@ -6,6 +6,7 @@ import com.iment.app_mobile_tcc.alternatives.service.AlternativeService;
 import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
 import com.iment.app_mobile_tcc.drafts.dto.response.DraftResponse;
 import com.iment.app_mobile_tcc.questions.entity.Question;
+import com.iment.app_mobile_tcc.questions.enums.QuestionTypeEnum;
 import com.iment.app_mobile_tcc.questions.service.QuestionService;
 import com.iment.app_mobile_tcc.topics.dto.response.ActivityResponse;
 import com.iment.app_mobile_tcc.topics.entity.Topic;
@@ -47,7 +48,7 @@ public class CatalogService {
 
         Topic published = this.copyTopic(source, user, true);
 
-        return CatalogResponse.from(published, 0, true, false);
+        return CatalogResponse.from(published, 0, true, false, this.questionService.getType(published.getId()));
     }
 
     @Transactional
@@ -71,7 +72,9 @@ public class CatalogService {
                         || topic.getSubject().getName().toLowerCase(Locale.forLanguageTag("pt-BR")).contains(search))
                 .toList();
 
-        Map<Long, Long> copies = this.topicService.countCopies(lstTopic.stream().map(Topic::getId).toList());
+        List<Long> ids = lstTopic.stream().map(Topic::getId).toList();
+        Map<Long, Long> copies = this.topicService.countCopies(ids);
+        Map<Long, QuestionTypeEnum> types = this.questionService.getTypes(ids);
         Set<Long> addedIds = this.getAddedIds(user);
 
         return lstTopic.stream()
@@ -79,7 +82,8 @@ public class CatalogService {
                         topic,
                         copies.getOrDefault(topic.getId(), 0L),
                         topic.getOwner().getId().equals(user.getId()),
-                        addedIds.contains(topic.getId())
+                        addedIds.contains(topic.getId()),
+                        types.get(topic.getId())
                 ))
                 .toList();
     }
@@ -98,7 +102,9 @@ public class CatalogService {
         if(this.getAddedIds(user).contains(id))
             throw new RuntimeException("Você já tem essa atividade na conta");
 
-        return DraftResponse.from(this.copyTopic(source, user, false), false);
+        Topic copy = this.copyTopic(source, user, false);
+
+        return DraftResponse.from(copy, false, this.questionService.getType(copy.getId()));
     }
 
     public Set<Long> getPublishedIds(User user){

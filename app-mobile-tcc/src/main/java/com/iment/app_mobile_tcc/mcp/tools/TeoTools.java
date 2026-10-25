@@ -2,7 +2,11 @@ package com.iment.app_mobile_tcc.mcp.tools;
 
 import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
 import com.iment.app_mobile_tcc.catalog.service.CatalogService;
+import com.iment.app_mobile_tcc.drafts.dto.request.GroupRequest;
+import com.iment.app_mobile_tcc.drafts.dto.request.GroupsDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.request.LettersDraftRequest;
+import com.iment.app_mobile_tcc.drafts.dto.request.SumDraftRequest;
+import com.iment.app_mobile_tcc.drafts.dto.request.SumRequest;
 import com.iment.app_mobile_tcc.drafts.dto.request.WordRequest;
 import com.iment.app_mobile_tcc.drafts.dto.response.DraftResponse;
 import com.iment.app_mobile_tcc.drafts.service.DraftService;
@@ -59,6 +63,31 @@ public class TeoTools {
             @McpToolParam(description = "Id da matéria, vindo de list_subjects. Palavras ficam em Linguagens.") Long subjectId,
             @McpToolParam(description = "As palavras da atividade, cada uma com word, blanks e emoji") List<WordRequest> words){
         return this.draftService.createLetters(new LettersDraftRequest(title, subjectId, words), this.getUser());
+    }
+
+    @McpTool(name = "create_sum_draft", description = """
+            Cria um rascunho de atividade de soma com bolinhas. Não publica nada: o adulto revisa e aprova depois.
+            Cada conta tem first e second, os dois a partir de 1, e o resultado vai até 30. No máximo 10 contas.
+            As opções de resposta são montadas sozinhas.
+            """)
+    public DraftResponse createSumDraft(
+            @McpToolParam(description = "Título curto da atividade, por exemplo: Somas até 10") String title,
+            @McpToolParam(description = "Id da matéria, vindo de list_subjects. Somas ficam em Matemática.") Long subjectId,
+            @McpToolParam(description = "As contas da atividade, cada uma com first e second") List<SumRequest> sums){
+        return this.draftService.createSum(new SumDraftRequest(title, subjectId, sums), this.getUser());
+    }
+
+    @McpTool(name = "create_groups_draft", description = """
+            Cria um rascunho de atividade de agrupar: a criança arrasta cada item para o grupo certo.
+            De 2 a 3 grupos, cada um com 1 a 4 itens, no máximo 9 itens. Cada item tem name e um único emoji.
+            Nome do grupo com até 14 caracteres e nome do item com até 18. Não publica nada: o adulto revisa e aprova depois.
+            """)
+    public DraftResponse createGroupsDraft(
+            @McpToolParam(description = "Título curto da atividade, por exemplo: Doce ou salgado") String title,
+            @McpToolParam(description = "Id da matéria, vindo de list_subjects") Long subjectId,
+            @McpToolParam(description = "Pergunta que aparece para a criança, por exemplo: Onde eles vivem?") String question,
+            @McpToolParam(description = "Os grupos, cada um com name e items, e cada item com name e emoji") List<GroupRequest> groups){
+        return this.draftService.createGroups(new GroupsDraftRequest(title, subjectId, question, groups), this.getUser());
     }
 
     private User getUser(){

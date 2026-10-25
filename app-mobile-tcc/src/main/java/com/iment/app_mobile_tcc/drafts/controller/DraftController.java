@@ -1,7 +1,9 @@
 package com.iment.app_mobile_tcc.drafts.controller;
 
 import com.iment.app_mobile_tcc.catalog.dto.response.CatalogResponse;
+import com.iment.app_mobile_tcc.drafts.dto.request.GroupsDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.request.LettersDraftRequest;
+import com.iment.app_mobile_tcc.drafts.dto.request.SumDraftRequest;
 import com.iment.app_mobile_tcc.drafts.dto.response.DraftResponse;
 import com.iment.app_mobile_tcc.drafts.service.DraftService;
 import com.iment.app_mobile_tcc.topics.dto.response.ActivityResponse;
@@ -23,6 +25,20 @@ public class DraftController {
     @PostMapping("/letters")
     public ResponseEntity<DraftResponse> createLetters(@RequestBody LettersDraftRequest request, @AuthenticationPrincipal User user){
         DraftResponse draft = this.draftService.createLetters(request, user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(draft);
+    }
+
+    @PostMapping("/sum")
+    public ResponseEntity<DraftResponse> createSum(@RequestBody SumDraftRequest request, @AuthenticationPrincipal User user){
+        DraftResponse draft = this.draftService.createSum(request, user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(draft);
+    }
+
+    @PostMapping("/groups")
+    public ResponseEntity<DraftResponse> createGroups(@RequestBody GroupsDraftRequest request, @AuthenticationPrincipal User user){
+        DraftResponse draft = this.draftService.createGroups(request, user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(draft);
     }
