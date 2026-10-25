@@ -1,12 +1,15 @@
 package com.iment.app_mobile_tcc.users.controller;
 
+import com.iment.app_mobile_tcc.shared.security.TeoCodeStore;
 import com.iment.app_mobile_tcc.shared.security.TokenService;
 import com.iment.app_mobile_tcc.users.dto.request.*;
 import com.iment.app_mobile_tcc.users.dto.response.AuthResponse;
+import com.iment.app_mobile_tcc.users.dto.response.TeoCodeResponse;
 import com.iment.app_mobile_tcc.users.dto.response.UserResponse;
 import com.iment.app_mobile_tcc.users.entity.User;
 import com.iment.app_mobile_tcc.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,12 +20,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final int PIN_MAX_ATTEMPTS = 5;
+
+    private static final Duration PIN_LOCK_TIME = Duration.ofMinutes(2);
+
+    private static final Duration TEO_SESSION_TIME = Duration.ofHours(8);
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TeoCodeStore teoCodeStore;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -71,7 +86,99 @@ public class AuthController {
         if(user.getPin() == null)
             return ResponseEntity.ok(false);
 
-        return ResponseEntity.ok(this.passwordEncoder.matches(request.pin(), user.getPin()));
+        if(this.isPinLocked(user))
+            return this.pinLockedResponse(user);
+
+        boolean valid = this.checkPin(user, request.pin());
+
+        if(this.isPinLocked(user))
+            return this.pinLockedResponse(user);
+
+        return ResponseEntity.ok(valid);
+    }
+
+    @PostMapping("/teo/code")
+    public ResponseEntity<TeoCodeResponse> createTeoCode(@RequestBody PinRequest request, @AuthenticationPrincipal User user){
+        if(user.getPin() == null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        if(this.isPinLocked(user))
+            return this.pinLockedResponse(user);
+
+        boolean valid = this.checkPin(user, request.pin());
+
+        if(this.isPinLocked(user))
+            return this.pinLockedResponse(user);
+
+        if(!valid)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        return ResponseEntity.ok(new TeoCodeResponse(this.teoCodeStore.create(user.getId())));
+    }
+
+    @PostMapping("/teo/exchange")
+    public ResponseEntity<AuthResponse> exchangeTeoCode(@RequestBody TeoCodeRequest request){
+        Long userId = this.teoCodeStore.consume(request.code());
+
+        if(userId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        User user = this.userRepository.findById(userId).orElse(null);
+
+        if(user == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String token = this.tokenService.generateTeoToken(user, Instant.now());
+
+        return ResponseEntity.ok(new AuthResponse(token, UserResponse.from(user)));
+    }
+
+    @PostMapping("/teo/refresh")
+    public ResponseEntity<AuthResponse> refreshTeoToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization, @AuthenticationPrincipal User user){
+        Instant pinAt = this.tokenService.getPinAt(authorization.replace("Bearer ", ""));
+
+        if(pinAt == null || Instant.now().isAfter(pinAt.plus(TEO_SESSION_TIME)))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String token = this.tokenService.generateTeoToken(user, pinAt);
+
+        return ResponseEntity.ok(new AuthResponse(token, UserResponse.from(user)));
+    }
+
+    private boolean isPinLocked(User user){
+        return user.getPinLockedUntil() != null && Instant.now().isBefore(user.getPinLockedUntil());
+    }
+
+    private <T> ResponseEntity<T> pinLockedResponse(User user){
+        long secondsLeft = Duration.between(Instant.now(), user.getPinLockedUntil()).toSeconds() + 1;
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(secondsLeft))
+                .build();
+    }
+
+    private boolean checkPin(User user, String pin){
+        if(this.passwordEncoder.matches(pin, user.getPin())){
+            if(user.getPinFailedAttempts() > 0){
+                user.setPinFailedAttempts(0);
+                this.userRepository.save(user);
+            }
+
+            return true;
+        }
+
+        int attempts = user.getPinFailedAttempts() + 1;
+
+        if(attempts >= PIN_MAX_ATTEMPTS){
+            user.setPinFailedAttempts(0);
+            user.setPinLockedUntil(Instant.now().plus(PIN_LOCK_TIME));
+        } else {
+            user.setPinFailedAttempts(attempts);
+        }
+
+        this.userRepository.save(user);
+
+        return false;
     }
 
     @PatchMapping("/profile")
