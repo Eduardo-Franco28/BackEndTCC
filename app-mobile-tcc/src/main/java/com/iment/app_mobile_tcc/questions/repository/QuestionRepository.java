@@ -18,4 +18,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAllByTopicIdWithAlternatives(@Param("topicId") Long topicId);
 
     long countAllByTopicId(Long topicId);
+
+    @Query("SELECT q.topic.id, q.type FROM Question q WHERE q.topic.id IN :topicIds ORDER BY q.level")
+    List<Object[]> findTypesByTopicIds(@Param("topicIds") List<Long> topicIds);
 }
